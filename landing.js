@@ -15,7 +15,7 @@ window.closeModal = function() {
 }
 
 // Switch between Login and Signup forms inside the modal
-function switchView(type) {
+window.switchView = function(type) {
     if (type === 'signup') {
         loginView.classList.remove('active');
         signupView.classList.add('active');
@@ -123,63 +123,69 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 // 4. Handle Standard Form Submission
-document.getElementById('pilot-form').addEventListener('submit', async (e) => {
-    e.preventDefault(); 
-    
-    const company = document.getElementById('company-name').value;
-    const email = document.getElementById('work-email').value;
-    const module = document.getElementById('module-select').value;
-    
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    submitBtn.innerText = "Provisioning...";
-    submitBtn.disabled = true;
+const pilotForm = document.getElementById('pilot-form');
+if (pilotForm) {
+    pilotForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); 
+        
+        const company = document.getElementById('company-name').value;
+        const email = document.getElementById('work-email').value;
+        const module = document.getElementById('module-select').value;
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.innerText = "Provisioning...";
+        submitBtn.disabled = true;
 
-    try {
-        const docRef = await addDoc(collection(db, "enterprise_pilots"), {
-            companyName: company,
-            workEmail: email,
-            selectedModule: module,
-            authMethod: "Manual Email",
-            status: "Pending Deployment",
-            timestamp: serverTimestamp()
-        });
-        
-        console.log("Pilot requested with ID: ", docRef.id);
-        alert("Success! Your pilot environment is being provisioned. Our team will contact you shortly.");
-        window.location.href = "dashboard.html"; 
-        
-    } catch (error) {
-        console.error("Error adding document: ", error);
-        alert("Error provisioning database. Please check console.");
-        submitBtn.innerText = "Provision Dashboard";
-        submitBtn.disabled = false;
-    }
-});
+        try {
+            const docRef = await addDoc(collection(db, "enterprise_pilots"), {
+                companyName: company,
+                workEmail: email,
+                selectedModule: module,
+                authMethod: "Manual Email",
+                status: "Pending Deployment",
+                timestamp: serverTimestamp()
+            });
+            
+            console.log("Pilot requested with ID: ", docRef.id);
+            alert("Success! Your pilot environment is being provisioned. Our team will contact you shortly.");
+            window.location.href = "dashboard.html"; 
+            
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            alert("Error provisioning database. Please check console.");
+            submitBtn.innerText = "Provision Dashboard";
+            submitBtn.disabled = false;
+        }
+    });
+}
 
 // 5. Handle Google Workspace SSO
-document.getElementById('google-sso-btn').addEventListener('click', async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        
-        await addDoc(collection(db, "enterprise_pilots"), {
-            companyName: "Google Auth User", 
-            workEmail: user.email,
-            selectedModule: "To Be Determined",
-            authMethod: "Google SSO",
-            uid: user.uid,
-            status: "Pending Deployment",
-            timestamp: serverTimestamp()
-        });
+const googleSsoBtn = document.getElementById('google-sso-btn');
+if (googleSsoBtn) {
+    googleSsoBtn.addEventListener('click', async () => {
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            
+            await addDoc(collection(db, "enterprise_pilots"), {
+                companyName: "Google Auth User", 
+                workEmail: user.email,
+                selectedModule: "To Be Determined",
+                authMethod: "Google SSO",
+                uid: user.uid,
+                status: "Pending Deployment",
+                timestamp: serverTimestamp()
+            });
 
-        alert(`Authenticated successfully as ${user.email}`);
-        window.location.href = "dashboard.html";
-        
-    } catch (error) {
-        console.error("SSO Failed: ", error.message);
-        alert("Authentication failed. Please try again.");
-    }
-});
+            alert(`Authenticated successfully as ${user.email}`);
+            window.location.href = "dashboard.html";
+            
+        } catch (error) {
+            console.error("SSO Failed: ", error.message);
+            alert("Authentication failed. Please try again.");
+        }
+    });
+}
 
 // 6. Handle Client Login Form Submission
 const loginForm = document.getElementById('login-form');
