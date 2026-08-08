@@ -78,6 +78,31 @@ window.handleAuth = function(event) {
     }, 1200);
 }
 
+// Validation for Google SSO Button
+window.validateSSO = function() {
+    const companyInput = document.getElementById('company');
+    const moduleSelect = document.getElementById('module-select');
+    const termsCheckbox = document.getElementById('terms-checkbox');
+    const googleSsoBtn = document.getElementById('google-sso-btn');
+    
+    if (googleSsoBtn && companyInput && moduleSelect && termsCheckbox) {
+        const isValid = companyInput.value.trim() !== '' && 
+                        !moduleSelect.options[moduleSelect.selectedIndex].disabled &&
+                        termsCheckbox.checked;
+        
+        googleSsoBtn.disabled = !isValid;
+    }
+}
+
+// Attach listeners for SSO validation
+const companyInput = document.getElementById('company');
+const moduleSelect = document.getElementById('module-select');
+const termsCheckbox = document.getElementById('terms-checkbox');
+
+if (companyInput) companyInput.addEventListener('input', window.validateSSO);
+if (moduleSelect) moduleSelect.addEventListener('change', window.validateSSO);
+if (termsCheckbox) termsCheckbox.addEventListener('change', window.validateSSO);
+
 // Close modal if user clicks outside the card
 modalOverlay.addEventListener('click', function(e) {
     if (e.target === modalOverlay) {

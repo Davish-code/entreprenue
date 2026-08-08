@@ -869,6 +869,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1
     background: rgba(255,255,255,0.05);
     border-color: var(--text-muted);
 }
+.sso-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* =========================================
    MOBILE RESPONSIVENESS (MEDIA QUERIES)
