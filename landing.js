@@ -97,3 +97,85 @@ function showSlides(n) {
     slides[slideIndex - 1].classList.add("active");  
     dots[slideIndex - 1].classList.add("active");
 }
+
+// --- FIREBASE BACKEND INTEGRATION ---
+
+// 1. Import Firebase dependencies directly from the CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// 2. PASTE YOUR FIREBASE CONFIG HERE
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// 3. Initialize Firebase services
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// 4. Handle Standard Form Submission
+document.getElementById('pilot-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); 
+    
+    const company = document.getElementById('company-name').value;
+    const email = document.getElementById('work-email').value;
+    const module = document.getElementById('module-select').value;
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.innerText = "Provisioning...";
+    submitBtn.disabled = true;
+
+    try {
+        const docRef = await addDoc(collection(db, "enterprise_pilots"), {
+            companyName: company,
+            workEmail: email,
+            selectedModule: module,
+            authMethod: "Manual Email",
+            status: "Pending Deployment",
+            timestamp: serverTimestamp()
+        });
+        
+        console.log("Pilot requested with ID: ", docRef.id);
+        alert("Success! Your pilot environment is being provisioned. Our team will contact you shortly.");
+        window.location.href = "dashboard.html"; 
+        
+    } catch (error) {
+        console.error("Error adding document: ", error);
+        alert("Error provisioning database. Please check console.");
+        submitBtn.innerText = "Provision Dashboard";
+        submitBtn.disabled = false;
+    }
+});
+
+// 5. Handle Google Workspace SSO
+document.getElementById('google-sso-btn').addEventListener('click', async () => {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        
+        await addDoc(collection(db, "enterprise_pilots"), {
+            companyName: "Google Auth User", 
+            workEmail: user.email,
+            selectedModule: "To Be Determined",
+            authMethod: "Google SSO",
+            uid: user.uid,
+            status: "Pending Deployment",
+            timestamp: serverTimestamp()
+        });
+
+        alert(`Authenticated successfully as ${user.email}`);
+        window.location.href = "dashboard.html";
+        
+    } catch (error) {
+        console.error("SSO Failed: ", error.message);
+        alert("Authentication failed. Please try again.");
+    }
+});
