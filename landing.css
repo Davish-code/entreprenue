@@ -822,3 +822,47 @@ body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1
     background: #2563eb;
     color: #ffffff;
 }
+
+/* SSO Button Styling */
+.sso-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 15px 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+.sso-divider::before, .sso-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+.sso-divider span {
+    padding: 0 10px;
+}
+.sso-btn {
+    width: 100%;
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.2s;
+    margin-bottom: 16px;
+}
+.sso-btn img {
+    width: 18px;
+    height: 18px;
+}
+.sso-btn:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--text-muted);
+}
