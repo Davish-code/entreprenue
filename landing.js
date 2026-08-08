@@ -107,13 +107,14 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstati
 
 // 2. PASTE YOUR FIREBASE CONFIG HERE
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_ID",
-    appId: "YOUR_APP_ID"
-};
+    apiKey: "AIzaSyC6A09UYfNJH84hdnCa1YRhJa_7SJplNt0",
+    authDomain: "entrepre-d7396.firebaseapp.com",
+    projectId: "entrepre-d7396",
+    storageBucket: "entrepre-d7396.firebasestorage.app",
+    messagingSenderId: "630944878630",
+    appId: "1:630944878630:web:bc525e1c15a1257bb416e7",
+    measurementId: "G-521YZP53HP"
+  };
 
 // 3. Initialize Firebase services
 const app = initializeApp(firebaseConfig);
