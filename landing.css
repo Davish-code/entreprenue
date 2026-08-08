@@ -5,6 +5,8 @@
     --text-muted: #94a3b8;
     --accent-blue: #3b82f6;
     --accent-blue-hover: #2563eb;
+    --accent-green: #10b981;
+    --accent-green-hover: #059669;
     --border-color: #1e293b;
 }
 
@@ -19,7 +21,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1
 .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: 0.2s; }
 .nav-links a:hover { color: var(--text-main); }
 .login-btn { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-.cta-btn { background: var(--accent-blue); color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+.cta-btn { display: inline-block; text-decoration: none; background: var(--accent-blue); color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
 .cta-btn:hover { background: var(--accent-blue-hover); }
 
 /* Hero Section */
@@ -813,13 +815,13 @@ body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1
 
 /* Solid button for the USP card so it stands out */
 .usp-btn-solid {
-    background: var(--accent-blue);
+    background: var(--accent-green);
     color: #ffffff;
     border: none;
 }
 
 .usp-btn-solid:hover {
-    background: #2563eb;
+    background: var(--accent-green-hover);
     color: #ffffff;
 }
 
