@@ -6,7 +6,7 @@ const loginView = document.getElementById('login-form');
 // Open the modal (specify 'login' or 'signup')
 window.openModal = function(type) {
     modalOverlay.classList.add('show');
-    switchView(type);
+    window.switchView(type);
 }
 
 // Close the modal
