@@ -4,13 +4,13 @@ const signupView = document.getElementById('signup-form');
 const loginView = document.getElementById('login-form');
 
 // Open the modal (specify 'login' or 'signup')
-function openModal(type) {
+window.openModal = function(type) {
     modalOverlay.classList.add('show');
     switchView(type);
 }
 
 // Close the modal
-function closeModal() {
+window.closeModal = function() {
     modalOverlay.classList.remove('show');
 }
 
@@ -26,7 +26,7 @@ function switchView(type) {
 }
 
 // Handle Form Submission (The Prototype Redirection)
-function handleAuth(event) {
+window.handleAuth = function(event) {
     event.preventDefault(); // Prevent page reload
     
     const submitBtn = event.target.querySelector('.submit-btn');
@@ -66,12 +66,12 @@ if (document.querySelector('.slide')) {
 }
 
 // Next/previous controls
-function changeSlide(n) {
+window.changeSlide = function(n) {
     showSlides(slideIndex += n);
 }
 
 // Thumbnail image controls
-function currentSlide(n) {
+window.currentSlide = function(n) {
     showSlides(slideIndex = n);
 }
 
