@@ -12,9 +12,29 @@ window.toggleMenu = function() {
 }
 
 // Open the modal (specify 'login' or 'signup')
-window.openModal = function(type) {
+window.openModal = function(type, module = null) {
     modalOverlay.classList.add('show');
     window.switchView(type);
+    
+    if (type === 'signup') {
+        const title = document.getElementById('signup-title');
+        const desc = document.getElementById('signup-desc');
+        const select = document.getElementById('module-select');
+        
+        if (module === 'eduflow') {
+            if (title) title.innerText = "Configure Academic Portal";
+            if (desc) desc.innerText = "Provision your EduFlow environment.";
+            if (select) select.value = 'eduflow';
+        } else {
+            if (title) title.innerText = "Configure Enterprise Pilot";
+            if (desc) desc.innerText = "Provision your secure environment.";
+            if (select && module) {
+                select.value = module;
+            } else if (select) {
+                select.value = 'oee';
+            }
+        }
+    }
 }
 
 // Close the modal

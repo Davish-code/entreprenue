@@ -80,7 +80,7 @@
                             <span class="usp-label">Weekly Time Saved[cite: 1]</span>
                         </div>
                     </div>
-                    <button class="deploy-btn usp-btn" onclick="openModal('signup')">Deploy Academic Portal</button>
+                    <button class="deploy-btn usp-btn" onclick="openModal('signup', 'eduflow')">Deploy Academic Portal</button>
                 </div>
             </div>
         </div>
@@ -327,8 +327,8 @@
             <button class="close-btn" onclick="closeModal()">×</button>
             
             <div id="signup-form" class="auth-view active">
-                <h2>Configure Enterprise Pilot</h2>
-                <p>Provision your secure environment.</p>
+                <h2 id="signup-title">Configure Enterprise Pilot</h2>
+                <p id="signup-desc">Provision your secure environment.</p>
                 <form onsubmit="handleAuth(event)">
                     <div class="input-group">
                         <label>Company Name</label>
@@ -340,7 +340,7 @@
                     </div>
                     <div class="input-group">
                         <label>Select Initial Module</label>
-                        <select required>
+                        <select id="module-select" required>
                             <option value="oee" disabled>-- Select Industrial Module --</option>
                             <option value="oee">OEE & Telemetry Analytics</option>
                             <option value="vision">AI Vision Quality Control</option>
