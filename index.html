@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VentureOS | Non-Invasive Industry 4.0</title>
+    <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">Sync<span>Forge</span></div>
+        <div class="nav-links">
+            <a href="#solutions">Solutions</a>
+            <a href="#tech">Technology</a>
+            <button class="login-btn" onclick="openModal('login')">Client Login</button>
+            <button class="cta-btn" onclick="openModal('signup')">Get Started</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <div class="badge">Zero-Downtime Integration</div>
+            <h1>Upgrade Your Enterprise.<br><span>Don't Replace It.</span></h1>
+            <p>Deploy military-grade edge telemetry, predictive maintenance, and AI visual inspection without interrupting your production line. Get real-time OEE in under 14 days.</p>
+            <div class="hero-actions">
+                <button class="cta-btn large" onclick="openModal('signup')">Deploy a Pilot</button>
+                <a href="#solutions" class="secondary-btn">View Modules</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Solutions / Modules Section -->
+    <section id="solutions" class="solutions-section">
+        <div class="section-header">
+            <span class="sub-heading">Hardware-Enabled SaaS</span>
+            <h2>Modular Edge Architecture</h2>
+            <p>Target specific operational bottlenecks. Deploy our edge-compute modules without rewiring a single PLC or halting your assembly line.</p>
+        </div>
+
+        <!-- Academic USP Flagship Block -->
+        <div class="usp-academic-card">
+            <div class="usp-badge">Ideathon Winner: Best AI Architecture</div>
+            <div class="usp-layout">
+                <div class="usp-content">
+                    <div class="icon-wrapper academic-icon">🎓</div>
+                    <h3>Flagship Academic Division: EduFlow AI</h3>
+                    <p>Our award-winning platform engineered for academic institutions. EduFlow acts as a 24/7 personal tutor, identifying knowledge gaps and tailoring content in real-time. We solve the "One Size Fits All" crisis and eliminate teacher burnout.</p>
+                    
+                    <ul class="feature-list usp-features">
+                        <li>✓ <strong>Adaptive Curriculum:</strong> Evolves difficulty based on engagement[cite: 1].</li>
+                        <li>✓ <strong>Instant Doubt Solving:</strong> NLP-powered chatbot for real-time answers[cite: 1].</li>
+                        <li>✓ <strong>Teacher Analytics:</strong> Dashboards to highlight at-risk students[cite: 1].</li>
+                    </ul>
+                </div>
+                
+                <div class="usp-metrics-panel">
+                    <h4>Projected Academic ROI</h4>
+                    <div class="usp-metrics-grid">
+                        <div class="usp-metric">
+                            <span class="usp-number">40%</span>
+                            <span class="usp-label">Grade Improvement[cite: 1]</span>
+                        </div>
+                        <div class="usp-metric">
+                            <span class="usp-number">2x</span>
+                            <span class="usp-label">Retention Rate[cite: 1]</span>
+                        </div>
+                        <div class="usp-metric">
+                            <span class="usp-number">15hr</span>
+                            <span class="usp-label">Weekly Time Saved[cite: 1]</span>
+                        </div>
+                    </div>
+                    <button class="deploy-btn usp-btn" onclick="openModal('signup')">Deploy Academic Portal</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- The existing <div class="solutions-grid"> stays right below this -->
+
+        <div class="solutions-grid">
+            <!-- Module 1: OEE -->
+            <div class="solution-card">
+                <div class="icon-wrapper">📊</div>
+                <h3>OEE & Telemetry Analytics</h3>
+                <p>Instantly track machine uptime, cycle times, and operational bottlenecks using non-invasive current transducers and light-tower sensors.</p>
+                <ul class="feature-list">
+                    <li>✓ Real-time dashboards</li>
+                    <li>✓ Automated shift reporting</li>
+                    <li>✓ MQTT low-latency streaming</li>
+                </ul>
+                <button class="deploy-btn" onclick="openModal('signup')">Deploy Module</button>
+            </div>
+
+            <!-- Module 2: Quality Vision -->
+            <div class="solution-card">
+                <div class="icon-wrapper">📷</div>
+                <h3>AI Vision Quality Control</h3>
+                <p>Automate visual inspections on high-speed lines. Our edge-inference cameras detect micro-defects at 60 frames per second.</p>
+                <ul class="feature-list">
+                    <li>✓ Sub-millimeter accuracy</li>
+                    <li>✓ Offline edge-processing</li>
+                    <li>✓ Automated reject triggering</li>
+                </ul>
+                <button class="deploy-btn" onclick="openModal('signup')">Deploy Module</button>
+            </div>
+
+            <!-- Module 3: Predictive Maintenance -->
+            <div class="solution-card">
+                <div class="icon-wrapper">⚙️</div>
+                <h3>Predictive Maintenance</h3>
+                <p>Strap our multi-axis vibration and thermal sensor pucks to your critical motors to predict bearing failures weeks before they happen.</p>
+                <ul class="feature-list">
+                    <li>✓ Thermal & vibration tracking</li>
+                    <li>✓ Automated SMS/Email alerts</li>
+                    <li>✓ Zero machine modification</li>
+                </ul>
+                <button class="deploy-btn" onclick="openModal('signup')">Deploy Module</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deployment Pipeline Section -->
+    <section id="tech" class="pipeline-section">
+        <div class="section-header">
+            <span class="sub-heading">Deployment Protocol</span>
+            <h2>Zero-Downtime Architecture</h2>
+            <p>We bridge the gap between legacy hardware and modern cloud analytics. Deployed in days, not months.</p>
+        </div>
+
+        <div class="pipeline-container">
+            <div class="pipeline-step">
+                <div class="step-number">01</div>
+                <div class="step-content">
+                    <h4>Non-Invasive Edge Nodes</h4>
+                    <p>We deploy industrial-grade IoT pucks and vision cameras directly onto existing machine chassis. No PLC reprogramming or assembly line shutdowns required.</p>
+                </div>
+            </div>
+            
+            <div class="pipeline-connector"></div>
+
+            <div class="pipeline-step">
+                <div class="step-number">02</div>
+                <div class="step-content">
+                    <h4>Local AI Inference</h4>
+                    <p>Raw data is processed locally on edge microcontrollers. Computer vision defect detection and digital logic filtering happen instantly on the factory floor to ensure zero latency.</p>
+                </div>
+            </div>
+
+            <div class="pipeline-connector"></div>
+
+            <div class="pipeline-step">
+                <div class="step-number">03</div>
+                <div class="step-content">
+                    <h4>Cloud Telemetry & Alerts</h4>
+                    <p>Clean, structured time-series data is streamed via secure MQTT to your centralized VentureOS dashboard, triggering automated SMS and UI alerts before failures happen.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- R&D Credibility Section -->
+    <section class="rnd-section">
+        <div class="rnd-container">
+            <div class="rnd-content">
+                <span class="sub-heading">Core Technology</span>
+                <h2>Powered by Award-Winning Predictive AI</h2>
+                <p>SyncForge isn't built on off-the-shelf APIs. Our proprietary edge-inference engine, originally developed for complex behavioral modeling and recognized at national ideathons, has been re-engineered specifically for industrial telemetry.</p>
+                
+                <div class="rnd-stats">
+                    <div class="rnd-stat-item">
+                        <h4>Proprietary NLP</h4>
+                        <p>Translates raw sensor noise into actionable maintenance alerts.</p>
+                    </div>
+                    <div class="rnd-stat-item">
+                        <h4>Dynamic Baselines</h4>
+                        <p>Machine learning models that adapt to your specific factory environment.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Interactive Pitch Deck Slider (Replaces the Badge) -->
+            <div class="pitch-slider-wrapper">
+                <div class="slider-header">
+                    <span>Ideathon Winning Pitch Deck</span>
+                </div>
+                
+                <div class="slider-container">
+                    <!-- Slide award: Title -->
+                    <div class="slide active">
+                        <img src="assets/award.jpg" alt="AI In Education - Opportunity or Risk[cite: 1]">
+                    </div>
+                    <!-- Slide 1: Title -->
+                    <div class="slide active">
+                        <img src="assets/slide1.jpg" alt="AI In Education - Opportunity or Risk[cite: 1]">
+                    </div>
+                    <!-- Slide 2: Problem -->
+                    <div class="slide">
+                        <img src="assets/slide2.jpg" alt="The One Size Fits All Crisis[cite: 1]">
+                    </div>
+                    <!-- Slide 3: Solution -->
+                    <div class="slide">
+                        <img src="assets/slide3.jpg" alt="Meet EduFlow[cite: 1]">
+                    </div>
+                    <!-- slide 4 -->
+                    <div class="slide">
+                        <img src="assets/slide4.jpg" alt="Meet EduFlow[cite: 1]">
+                    </div>
+                    <!-- slide 4 -->
+                    <div class="slide">
+                        <img src="assets/slide5.jpg" alt="Meet EduFlow[cite: 1]">
+                    </div>
+
+                    <!-- Navigation Arrows -->
+                    <button class="slider-btn prev-btn" onclick="changeSlide(-1)">&#10094;</button>
+                    <button class="slider-btn next-btn" onclick="changeSlide(1)">&#10095;</button>
+                </div>
+                
+                <!-- Slide Indicators -->
+                <div class="slider-dots">
+                    <span class="dot active" onclick="currentSlide(1)"></span>
+                    <span class="dot" onclick="currentSlide(2)"></span>
+                    <span class="dot" onclick="currentSlide(3)"></span>
+                    <span class="dot" onclick="currentSlide(4)"></span>
+                    <span class="dot" onclick="currentSlide(5)"></span>
+                    <span class="dot" onclick="currentSlide(6)"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enterprise ROI Banner -->
+    <section class="roi-section">
+        <div class="roi-content">
+            <h2>Stop guessing. Start measuring.</h2>
+            <p>Our pilot deployments average a massive reduction in unplanned downtime within the first 30 days of integration.</p>
+            
+            <div class="metrics-grid">
+                <div class="metric">
+                    <h3>-40%</h3>
+                    <span>Unplanned Downtime</span>
+                </div>
+                <div class="metric">
+                    <h3>+15%</h3>
+                    <span>OEE Improvement</span>
+                </div>
+                <div class="metric">
+                    <h3>&lt; 14 Days</h3>
+                    <span>Time to Value</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modules in Action Section -->
+    <section id="modules-action" class="action-section">
+        <div class="section-header">
+            <span class="sub-heading">Modules in Action</span>
+        </div>
+
+        <div class="action-grid">
+            <!-- Card 1: Telemetry -->
+            <div class="action-card">
+                <div class="image-wrapper">
+                    <!-- REPLACE the src below with your AI generated image file -->
+                    <img src="assets/telemetry-demo.png" alt="OEE & Telemetry Streaming" class="module-image">
+                </div>
+                <div class="action-content">
+                    <h4>OEE & Telemetry Streaming</h4>
+                    <p>Edge-based sensor retrofit for real-time asset health. Zero network footprint.</p>
+                    <button class="action-btn" onclick="openModal('signup')">Analyze Pipeline</button>
+                </div>
+            </div>
+
+            <!-- Card 2: Predictive AI -->
+            <div class="action-card">
+                <div class="image-wrapper">
+                    <!-- REPLACE the src below with your AI generated image file -->
+                    <img src="assets/predictive-demo.png" alt="Predictive Failure Modeling" class="module-image">
+                </div>
+                <div class="action-content">
+                    <h4>Predictive Failure Modeling</h4>
+                    <p>AI signature analysis for early warning and part replacement scheduling.</p>
+                    <button class="action-btn" onclick="openModal('signup')">Explore Failure Models</button>
+                </div>
+            </div>
+
+            <!-- Card 3: Vision Inspection -->
+            <div class="action-card">
+                <div class="image-wrapper">
+                    <!-- REPLACE the src below with your AI generated image file -->
+                    <img src="assets/vision-demo.png" alt="AI Vision Quality Inspection" class="module-image">
+                </div>
+                <div class="action-content">
+                    <h4>AI Vision Quality Inspection</h4>
+                    <p>Edge AI inspection at 60 FPS with sub-millimeter accuracy. Automated reject system integration.</p>
+                    <button class="action-btn" onclick="openModal('signup')">Run Inspection Demo</button>
+                </div>
+            </div>
+
+            <!-- Card 4: The Academic USP -->
+            <div class="action-card usp-highlight-card">
+                <div class="image-wrapper">
+                    <!-- Put a screenshot of your EduFlow dashboard or ideathon poster here -->
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" alt="EduFlow Academic AI" class="module-image">
+                </div>
+                <div class="action-content">
+                    <h4 class="usp-text">EduFlow: Academic AI (Ideathon Winner)</h4>
+                    <p>Our flagship educational platform that acts as a 24/7 personal tutor, identifying knowledge gaps and tailoring content to specific learning styles[cite: 1].</p>
+                    <button class="action-btn usp-btn-solid" onclick="openModal('signup')">Deploy Academic Portal</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Authentication Modal (Hidden by default) -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            
+            <div id="signup-form" class="auth-view active">
+                <h2>Configure Enterprise Pilot</h2>
+                <p>Provision your secure environment.</p>
+                <form onsubmit="handleAuth(event)">
+                    <div class="input-group">
+                        <label>Company Name</label>
+                        <input type="text" id="company" required placeholder="e.g. Apex Manufacturing">
+                    </div>
+                    <div class="input-group">
+                        <label>Work Email</label>
+                        <input type="email" required placeholder="manager@company.com">
+                    </div>
+                    <div class="input-group">
+                        <label>Select Initial Module</label>
+                        <select required>
+                            <option value="oee" disabled>-- Select Industrial Module --</option>
+                            <option value="oee">OEE & Telemetry Analytics</option>
+                            <option value="vision">AI Vision Quality Control</option>
+                            <option value="predictive">Predictive Maintenance</option>
+                            <option value="eduflow" disabled>-- Select Academic Module --</option>
+                            <option value="eduflow">EduFlow: Academic AI Portal</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn">Provision Dashboard</button>
+                </form>
+                <div class="switch-auth">Already a client? <span onclick="switchView('login')">Log in</span></div>
+            </div>
+
+            <div id="login-form" class="auth-view">
+                <h2>Client Portal Access</h2>
+                <p>Enter your credentials to access live telemetry.</p>
+                <form onsubmit="handleAuth(event)">
+                    <div class="input-group">
+                        <label>Work Email</label>
+                        <input type="email" required placeholder="admin@company.com">
+                    </div>
+                    <div class="input-group">
+                        <label>Access Key</label>
+                        <input type="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="submit-btn">Access Fleet</button>
+                </form>
+                <div class="switch-auth">Need to deploy? <span onclick="switchView('signup')">Start Pilot</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="landing.js"></script>
+</body>
+</html>

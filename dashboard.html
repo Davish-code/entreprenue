@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industry 4.0 | Apex Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">Venture<span>OS</span></div>
+            <nav>
+                <a href="#" class="active">Live Telemetry</a>
+                <a href="#">Module Store</a>
+                <a href="#">Fleet Management</a>
+                <a href="#">Settings</a>
+            </nav>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <header class="topbar">
+                <div class="client-info">
+                    <h2>Apex Heavy Manufacturing</h2>
+                    <span class="status-badge green">System Online</span>
+                </div>
+                <div class="user-profile">Plant Manager Portal</div>
+            </header>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                
+                <!-- Business Model Proof: Modules -->
+                <section class="card modules-card">
+                    <h3>Active Modules</h3>
+                    <div class="module-list">
+                        <div class="module-item active">
+                            <span>Telemetry & OEE</span>
+                            <span class="tag">Active</span>
+                        </div>
+                        <div class="module-item active">
+                            <span>Vision Quality Control</span>
+                            <span class="tag">Active</span>
+                        </div>
+                        <div class="module-item inactive">
+                            <span>Predictive Maintenance</span>
+                            <button class="upgrade-btn">Upgrade</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Value Proof: OEE Metrics -->
+                <section class="card metrics-card">
+                    <h3>Overall Equipment Effectiveness (OEE)</h3>
+                    <div class="big-metric">
+                        <span id="oee-score">81.3</span>%
+                    </div>
+                    <div class="sub-metrics">
+                        <div>Availability: <span id="avail-score">94.2%</span></div>
+                        <div>Quality: <span id="qual-score">98.1%</span></div>
+                    </div>
+                </section>
+
+                <!-- Tech Proof: Live Sensors -->
+                <section class="card sensor-card">
+                    <h3>Live Edge Telemetry: CNC_Milling_04</h3>
+                    <div class="sensor-grid">
+                        <div class="sensor-box">
+                            <h4>Spindle Temp</h4>
+                            <div class="sensor-value"><span id="temp-val">62.4</span>°C</div>
+                        </div>
+                        <div class="sensor-box">
+                            <h4>Vibration</h4>
+                            <div class="sensor-value"><span id="vib-val">115.2</span> Hz</div>
+                        </div>
+                        <div class="sensor-box">
+                            <h4>Current Load</h4>
+                            <div class="sensor-value"><span id="amp-val">12.4</span> A</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Alert System -->
+                <section class="card alert-card" id="alert-container">
+                    <h3>System Alerts</h3>
+                    <div class="alert-feed" id="alert-feed">
+                        <div class="alert normal">All systems operating within normal parameters.</div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
