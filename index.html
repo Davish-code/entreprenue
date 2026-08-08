@@ -348,10 +348,11 @@
                             <option value="eduflow" disabled>-- Select Academic Module --</option>
                             <option value="eduflow">EduFlow: Academic AI Portal</option>
                         </select>
-                        <div class="checkbox-group" style="margin-top: 15px; margin-bottom: 15px;">
-                            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); cursor: pointer;">
+                        <div class="custom-checkbox-group">
+                            <label class="custom-checkbox">
                                 <input type="checkbox" id="terms-checkbox">
-                                I agree to the Terms and Conditions
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">I agree to the <a href="#" class="terms-link">Terms and Conditions</a></span>
                             </label>
                         </div>
                         <div class="sso-divider"><span>OR</span></div>
@@ -365,7 +366,7 @@
                             Continue with Google Workspace
                         </button>
                     </div>
-                    <button type="submit" class="submit-btn">Provision Dashboard</button>
+                    <button type="submit" class="submit-btn" disabled>Provision Dashboard</button>
                 </form>
                 <div class="switch-auth">Already a client? <span onclick="switchView('login')">Log in</span></div>
             </div>

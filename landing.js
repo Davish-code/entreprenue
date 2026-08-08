@@ -78,19 +78,23 @@ window.handleAuth = function(event) {
     }, 1200);
 }
 
-// Validation for Google SSO Button
+// Validation for Google SSO Button and Submit Button
 window.validateSSO = function() {
     const companyInput = document.getElementById('company');
     const moduleSelect = document.getElementById('module-select');
     const termsCheckbox = document.getElementById('terms-checkbox');
     const googleSsoBtn = document.getElementById('google-sso-btn');
+    const submitBtn = document.querySelector('#signup-form .submit-btn');
     
-    if (googleSsoBtn && companyInput && moduleSelect && termsCheckbox) {
-        const isValid = companyInput.value.trim() !== '' && 
-                        !moduleSelect.options[moduleSelect.selectedIndex].disabled &&
-                        termsCheckbox.checked;
+    if (companyInput && moduleSelect && termsCheckbox) {
+        const companyFilled = companyInput.value.trim() !== '';
+        const moduleSelected = !moduleSelect.options[moduleSelect.selectedIndex].disabled;
+        const termsAccepted = termsCheckbox.checked;
         
-        googleSsoBtn.disabled = !isValid;
+        const isValid = companyFilled && moduleSelected && termsAccepted;
+        
+        if (googleSsoBtn) googleSsoBtn.disabled = !isValid;
+        if (submitBtn) submitBtn.disabled = !isValid;
     }
 }
 

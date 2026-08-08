@@ -57,6 +57,74 @@ body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1
 
 .submit-btn { width: 100%; background: var(--accent-blue); color: white; border: none; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 16px; }
 .submit-btn:hover { background: var(--accent-blue-hover); }
+.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; background: #1e3a5f; }
+
+/* Custom Checkbox */
+.custom-checkbox-group { margin: 18px 0; }
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+.custom-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.custom-checkbox .checkmark {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.custom-checkbox .checkmark::after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 11px;
+    border: solid transparent;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg) scale(0);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: -2px;
+}
+.custom-checkbox input[type="checkbox"]:checked + .checkmark {
+    background: linear-gradient(135deg, var(--accent-blue), #6366f1);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+.custom-checkbox input[type="checkbox"]:checked + .checkmark::after {
+    border-color: white;
+    transform: rotate(45deg) scale(1);
+}
+.custom-checkbox:hover .checkmark {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.15);
+}
+.checkbox-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.terms-link {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+.terms-link:hover {
+    text-decoration: underline;
+}
+
 .switch-auth { text-align: center; font-size: 14px; color: var(--text-muted); }
 .switch-auth span { color: var(--accent-blue); cursor: pointer; font-weight: 600; }
 
