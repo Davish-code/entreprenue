@@ -9,8 +9,17 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="logo">Sync<span>Forge</span></div>
-        <div class="nav-links">
+        <div class="nav-header">
+            <div class="logo">Sync<span>Forge</span></div>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="nav-links" id="nav-links">
             <a href="#solutions">Solutions</a>
             <a href="#tech">Technology</a>
             <button class="login-btn" onclick="openModal('login')">Client Login</button>

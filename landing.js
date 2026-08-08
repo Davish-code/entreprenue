@@ -3,6 +3,14 @@ const modalOverlay = document.getElementById('auth-modal');
 const signupView = document.getElementById('signup-form');
 const loginView = document.getElementById('login-form');
 
+// Mobile Menu Toggle
+window.toggleMenu = function() {
+    const navLinks = document.getElementById('nav-links');
+    if (navLinks) {
+        navLinks.classList.toggle('show');
+    }
+}
+
 // Open the modal (specify 'login' or 'signup')
 window.openModal = function(type) {
     modalOverlay.classList.add('show');

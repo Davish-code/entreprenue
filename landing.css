@@ -17,6 +17,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1
 .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; border-bottom: 1px solid var(--border-color); background: rgba(7, 11, 20, 0.9); position: sticky; top: 0; backdrop-filter: blur(10px); z-index: 100; }
 .logo { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
 .logo span { color: var(--accent-blue); }
+.menu-toggle { display: none; cursor: pointer; color: var(--text-main); }
 .nav-links { display: flex; gap: 24px; align-items: center; }
 .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: 0.2s; }
 .nav-links a:hover { color: var(--text-main); }
@@ -934,20 +935,51 @@ body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1
     /* Navbar tweaks for mobile */
     .navbar {
         flex-direction: column;
-        gap: 15px;
-        padding: 15px 5%;
+        gap: 16px;
+        padding: 16px 5%;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    .logo {
+        font-size: 22px;
+    }
+    .menu-toggle {
+        display: block;
     }
     .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
+        display: none;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        width: 100%;
+        align-items: center;
+    }
+    .nav-links.show {
+        display: grid;
     }
     .nav-links a {
-        font-size: 14px;
+        font-size: 13px;
+        text-align: center;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: var(--text-muted);
+    }
+    .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-main);
     }
     .login-btn, .cta-btn {
-        padding: 6px 14px;
-        font-size: 14px;
+        width: 100%;
+        padding: 10px;
+        font-size: 13px;
+        text-align: center;
+        box-sizing: border-box;
     }
 
     /* Force grids to single column */
