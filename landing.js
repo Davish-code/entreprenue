@@ -180,3 +180,31 @@ document.getElementById('google-sso-btn').addEventListener('click', async () => 
         alert("Authentication failed. Please try again.");
     }
 });
+
+// 6. Handle Client Login Form Submission
+const loginForm = document.getElementById('login-form');
+
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Stop the page from refreshing
+
+        // Grab the button to show a loading state
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = "Authenticating...";
+        submitBtn.disabled = true;
+
+        // Simulate a secure network delay for realism during your professor's pitch
+        setTimeout(() => {
+            // For the prototype, we simulate a successful Access Key verification
+            alert("Authentication successful. Securing connection to fleet telemetry...");
+            
+            // Redirect to the dashboard
+            window.location.href = "dashboard.html";
+            
+            // Reset button just in case the user navigates back
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }, 1500); 
+    });
+}
