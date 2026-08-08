@@ -929,15 +929,59 @@ body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1
 /* For Mobile Phones (under 600px) */
 @media screen and (max-width: 600px) {
     
+    /* Navbar tweaks for mobile */
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 5%;
+    }
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    .nav-links a {
+        font-size: 14px;
+    }
+    .login-btn, .cta-btn {
+        padding: 6px 14px;
+        font-size: 14px;
+    }
+
     /* Force grids to single column */
     .action-grid,
     .solutions-grid {
         grid-template-columns: 1fr;
     }
 
-    /* Reduce massive enterprise fonts for small screens */
-    .hero-section h1 {
-        font-size: 36px;
+    /* Hero section fixes */
+    .hero {
+        padding: 80px 5% 60px;
+        min-height: auto;
+    }
+    .hero h1 {
+        font-size: 34px;
+        margin-bottom: 16px;
+    }
+    .hero p {
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+    .badge {
+        font-size: 11px;
+        padding: 5px 12px;
+        margin-bottom: 16px;
+    }
+    .hero-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+    .hero-actions .cta-btn.large,
+    .hero-actions .secondary-btn {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
     }
     
     .rnd-content h2,
