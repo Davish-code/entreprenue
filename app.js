@@ -332,6 +332,7 @@ window.submitStudentForm = async function(event) {
     btn.disabled = true;
 
     const name = document.getElementById('student-name').value;
+    const regNo = document.getElementById('student-reg').value;
     const branch = document.getElementById('student-branch').value;
 
     // Collect all subject rows
@@ -349,7 +350,7 @@ window.submitStudentForm = async function(event) {
 
     try {
         await addDoc(collection(db, "eduflow"), {
-            name, branch, subjects, timestamp: serverTimestamp()
+            name, regNo, branch, subjects, timestamp: serverTimestamp()
         });
         alert("Student added successfully!");
         document.getElementById('student-form').reset();
@@ -378,13 +379,13 @@ window.loadStudentsTable = async function() {
     const tbody = document.getElementById('students-tbody');
     if (!tbody) return;
     
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Loading data from Firebase...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Loading data from Firebase...</td></tr>';
     
     try {
         const querySnapshot = await getDocs(collection(db, "eduflow"));
         tbody.innerHTML = '';
         if (querySnapshot.empty) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No students found in database.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No students found in database.</td></tr>';
             return;
         }
         
@@ -406,6 +407,7 @@ window.loadStudentsTable = async function() {
             }
             tr.innerHTML = `
                 <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.name || '-'}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.regNo || '-'}</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.branch || '-'}</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${subjectsStr}</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${marksStr}</td>
@@ -415,7 +417,7 @@ window.loadStudentsTable = async function() {
         });
     } catch (e) {
         console.error("Error fetching students: ", e);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--accent-red); padding:20px;">Failed to load database. Check config.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--accent-red); padding:20px;">Failed to load database. Check config.</td></tr>';
     }
 };
 
@@ -431,6 +433,10 @@ function injectStudentDetailsUI(container) {
                     <div>
                         <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Full Name</label>
                         <input type="text" id="student-name" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Registration Number</label>
+                        <input type="text" id="student-reg" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
                     </div>
                     <div>
                         <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Branch</label>
@@ -462,6 +468,7 @@ function injectStudentDetailsUI(container) {
                         <thead>
                             <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px;">
                                 <th style="padding: 12px 10px;">Name</th>
+                                <th style="padding: 12px 10px;">Reg. No</th>
                                 <th style="padding: 12px 10px;">Branch</th>
                                 <th style="padding: 12px 10px;">Subjects</th>
                                 <th style="padding: 12px 10px;">Marks</th>
