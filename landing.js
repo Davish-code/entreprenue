@@ -78,7 +78,12 @@ window.handleAuth = function(event) {
 
         // REDIRECT TO YOUR DASHBOARD
         // Ensure your previous file is named dashboard.html
-        window.location.href = 'dashboard.html';
+        window.open('dashboard.html', '_blank');
+        
+        // Reset the button state
+        submitBtn.innerText = originalText;
+        submitBtn.style.opacity = "1";
+        closeModal();
     }, 1200);
 }
 
