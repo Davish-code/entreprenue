@@ -1,9 +1,12 @@
+import { db, collection, addDoc, serverTimestamp, getDocs } from "./firebase-config.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('dashboard-content');
     const clientName = document.getElementById('client-name');
     const dashboardLogo = document.getElementById('dashboard-logo');
     const breadcrumb = document.getElementById('breadcrumb');
     const navHome = document.getElementById('nav-home');
+    const navStudents = document.getElementById('nav-students');
 
     // Retrieve data from localStorage
     const company = localStorage.getItem('companyName') || 'Guest Client';
@@ -17,7 +20,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dashboardLogo) dashboardLogo.innerHTML = 'Edu<span>Flow</span>';
         if (breadcrumb) breadcrumb.innerText = 'Academic Portal > Overview';
         if (navHome) navHome.innerText = 'Campus Overview';
+        if (navStudents) navStudents.style.display = 'block';
+
         injectAcademicUI(content);
+
+        if (navHome && navStudents) {
+            navHome.addEventListener('click', (e) => {
+                e.preventDefault();
+                navHome.classList.add('active');
+                navStudents.classList.remove('active');
+                breadcrumb.innerText = 'Academic Portal > Overview';
+                injectAcademicUI(content);
+            });
+
+            navStudents.addEventListener('click', (e) => {
+                e.preventDefault();
+                navStudents.classList.add('active');
+                navHome.classList.remove('active');
+                breadcrumb.innerText = 'Academic Portal > Student Details';
+                injectStudentDetailsUI(content);
+            });
+        }
+
     } else {
         // We use VentureOS for industrial as per original CSS/Dashboard
         if (dashboardLogo) dashboardLogo.innerHTML = 'Venture<span>OS</span>';
@@ -272,5 +296,129 @@ function injectPredictiveUI(container) {
                 </div>
             </div>
         </section>
+        </section>
     `;
+}
+
+// --- NEW STUDENT DETAILS FIREBASE UI ---
+window.submitStudentForm = async function(event) {
+    event.preventDefault();
+    const btn = document.getElementById('add-student-btn');
+    btn.innerText = "Adding...";
+    btn.disabled = true;
+
+    const name = document.getElementById('student-name').value;
+    const branch = document.getElementById('student-branch').value;
+    const subjects = document.getElementById('student-subjects').value;
+    const marks = document.getElementById('student-marks').value;
+    const attendance = document.getElementById('student-attendance').value;
+
+    try {
+        await addDoc(collection(db, "eduflow"), {
+            name, branch, subjects, marks, attendance, timestamp: serverTimestamp()
+        });
+        alert("Student added successfully!");
+        document.getElementById('student-form').reset();
+        window.loadStudentsTable();
+    } catch (e) {
+        console.error("Error adding student: ", e);
+        alert("Failed to add student. Check console.");
+    } finally {
+        btn.innerText = "Add Student";
+        btn.disabled = false;
+    }
+};
+
+window.loadStudentsTable = async function() {
+    const tbody = document.getElementById('students-tbody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Loading data from Firebase...</td></tr>';
+    
+    try {
+        const querySnapshot = await getDocs(collection(db, "eduflow"));
+        tbody.innerHTML = '';
+        if (querySnapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No students found in database.</td></tr>';
+            return;
+        }
+        
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.name || '-'}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.branch || '-'}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.subjects || '-'}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.marks || '-'}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.attendance || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        console.error("Error fetching students: ", e);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--accent-red); padding:20px;">Failed to load database. Check config.</td></tr>';
+    }
+};
+
+function injectStudentDetailsUI(container) {
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div style="grid-column: span 2; display: flex; gap: 24px;">
+            <!-- Form Section -->
+            <section class="card" style="flex: 1; height: fit-content;">
+                <h3 style="margin-bottom: 20px;">Add New Student</h3>
+                <form id="student-form" onsubmit="window.submitStudentForm(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Full Name</label>
+                        <input type="text" id="student-name" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Branch</label>
+                        <input type="text" id="student-branch" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Subjects</label>
+                        <input type="text" id="student-subjects" required placeholder="e.g. Math, Physics" style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Marks / GPA</label>
+                            <input type="text" id="student-marks" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Attendance %</label>
+                            <input type="text" id="student-attendance" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                        </div>
+                    </div>
+                    <button type="submit" id="add-student-btn" style="padding:12px; background:var(--accent-blue); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:10px;">Add Student</button>
+                </form>
+            </section>
+
+            <!-- Table Section -->
+            <section class="card" style="flex: 2;">
+                <h3 style="margin-bottom: 20px;">Student Directory (Firebase)</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px;">
+                                <th style="padding: 12px 10px;">Name</th>
+                                <th style="padding: 12px 10px;">Branch</th>
+                                <th style="padding: 12px 10px;">Subjects</th>
+                                <th style="padding: 12px 10px;">Marks</th>
+                                <th style="padding: 12px 10px;">Attendance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-tbody">
+                            <!-- Injected by Firebase -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    `;
+    
+    // Load data from Firebase
+    window.loadStudentsTable();
 }

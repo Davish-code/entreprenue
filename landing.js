@@ -166,27 +166,8 @@ function showSlides(n) {
 
 // --- FIREBASE BACKEND INTEGRATION ---
 
-// 1. Import Firebase dependencies directly from the CDN
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-// 2. PASTE YOUR FIREBASE CONFIG HERE
-const firebaseConfig = {
-    apiKey: "AIzaSyC6A09UYfNJH84hdnCa1YRhJa_7SJplNt0",
-    authDomain: "entrepre-d7396.firebaseapp.com",
-    projectId: "entrepre-d7396",
-    storageBucket: "entrepre-d7396.firebasestorage.app",
-    messagingSenderId: "630944878630",
-    appId: "1:630944878630:web:bc525e1c15a1257bb416e7",
-    measurementId: "G-521YZP53HP"
-  };
-
-// 3. Initialize Firebase services
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+// 1. Import Firebase dependencies from shared config
+import { db, auth, provider, collection, addDoc, serverTimestamp } from "./firebase-config.js";
 
 // 4. Handle Standard Form Submission
 const pilotForm = document.getElementById('pilot-form');
