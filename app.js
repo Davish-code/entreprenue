@@ -301,6 +301,29 @@ function injectPredictiveUI(container) {
 }
 
 // --- NEW STUDENT DETAILS FIREBASE UI ---
+let subjectCounter = 1;
+
+window.addSubjectRow = function() {
+    subjectCounter++;
+    const container = document.getElementById('subjects-container');
+    if (!container) return;
+    const row = document.createElement('div');
+    row.className = 'subject-row';
+    row.id = `subject-row-${subjectCounter}`;
+    row.style.cssText = 'display:flex; gap:8px; align-items:center;';
+    row.innerHTML = `
+        <input type="text" placeholder="Subject" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+        <input type="text" placeholder="Marks" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+        <button type="button" onclick="window.removeSubjectRow('subject-row-${subjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+    `;
+    container.appendChild(row);
+};
+
+window.removeSubjectRow = function(rowId) {
+    const row = document.getElementById(rowId);
+    if (row) row.remove();
+};
+
 window.submitStudentForm = async function(event) {
     event.preventDefault();
     const btn = document.getElementById('add-student-btn');
@@ -309,16 +332,43 @@ window.submitStudentForm = async function(event) {
 
     const name = document.getElementById('student-name').value;
     const branch = document.getElementById('student-branch').value;
-    const subjects = document.getElementById('student-subjects').value;
-    const marks = document.getElementById('student-marks').value;
     const attendance = document.getElementById('student-attendance').value;
+
+    // Collect all subject rows
+    const rows = document.querySelectorAll('#subjects-container .subject-row');
+    const subjects = [];
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const subName = inputs[0].value.trim();
+        const subMarks = inputs[1].value.trim();
+        if (subName && subMarks) {
+            subjects.push({ subject: subName, marks: subMarks });
+        }
+    });
+
+    if (subjects.length === 0) {
+        alert('Please add at least one subject with marks.');
+        btn.innerText = "Add Student";
+        btn.disabled = false;
+        return;
+    }
 
     try {
         await addDoc(collection(db, "eduflow"), {
-            name, branch, subjects, marks, attendance, timestamp: serverTimestamp()
+            name, branch, subjects, attendance, timestamp: serverTimestamp()
         });
         alert("Student added successfully!");
         document.getElementById('student-form').reset();
+        // Reset subjects to single row
+        const container = document.getElementById('subjects-container');
+        container.innerHTML = `
+            <div class="subject-row" id="subject-row-1" style="display:flex; gap:8px; align-items:center;">
+                <input type="text" placeholder="Subject" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                <input type="text" placeholder="Marks" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                <div style="width:36px;"></div>
+            </div>
+        `;
+        subjectCounter = 1;
         window.loadStudentsTable();
     } catch (e) {
         console.error("Error adding student: ", e);
@@ -346,11 +396,21 @@ window.loadStudentsTable = async function() {
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             const tr = document.createElement('tr');
+            // Format subjects array into readable strings
+            let subjectsStr = '-';
+            let marksStr = '-';
+            if (Array.isArray(data.subjects)) {
+                subjectsStr = data.subjects.map(s => s.subject).join(', ');
+                marksStr = data.subjects.map(s => `${s.subject}: ${s.marks}`).join(', ');
+            } else {
+                subjectsStr = data.subjects || '-';
+                marksStr = data.marks || '-';
+            }
             tr.innerHTML = `
                 <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.name || '-'}</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.branch || '-'}</td>
-                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.subjects || '-'}</td>
-                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.marks || '-'}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${subjectsStr}</td>
+                <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${marksStr}</td>
                 <td style="padding: 12px 10px; border-bottom: 1px solid var(--border-color);">${data.attendance || '-'}</td>
             `;
             tbody.appendChild(tr);
@@ -379,18 +439,21 @@ function injectStudentDetailsUI(container) {
                         <input type="text" id="student-branch" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
                     </div>
                     <div>
-                        <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Subjects</label>
-                        <input type="text" id="student-subjects" required placeholder="e.g. Math, Physics" style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <label style="font-size:12px; color:var(--text-muted);">Subjects & Marks</label>
+                            <button type="button" onclick="window.addSubjectRow()" style="padding:4px 12px; background:rgba(59,130,246,0.2); color:var(--accent-blue); border:1px solid rgba(59,130,246,0.4); border-radius:4px; cursor:pointer; font-size:16px; font-weight:bold;">+ Add Subject</button>
+                        </div>
+                        <div id="subjects-container" style="display:flex; flex-direction:column; gap:8px;">
+                            <div class="subject-row" id="subject-row-1" style="display:flex; gap:8px; align-items:center;">
+                                <input type="text" placeholder="Subject" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                                <input type="text" placeholder="Marks" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                                <div style="width:36px;"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <div style="flex: 1;">
-                            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Marks / GPA</label>
-                            <input type="text" id="student-marks" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Attendance %</label>
-                            <input type="text" id="student-attendance" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
-                        </div>
+                    <div>
+                        <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Attendance %</label>
+                        <input type="text" id="student-attendance" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
                     </div>
                     <button type="submit" id="add-student-btn" style="padding:12px; background:var(--accent-blue); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:10px;">Add Student</button>
                 </form>
