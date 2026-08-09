@@ -3,93 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Industry 4.0 | Apex Dashboard</title>
+    <title>Dashboard | SyncForge</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">Venture<span>OS</span></div>
-            <nav>
-                <a href="#" class="active">Live Telemetry</a>
-                <a href="#">Module Store</a>
-                <a href="#">Fleet Management</a>
+        <!-- Universal Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo" id="dashboard-logo">Sync<span>Forge</span></div>
+            <nav id="sidebar-nav">
+                <a href="#" class="active" id="nav-home">Overview</a>
+                <a href="#">Analytics</a>
+                <a href="#">Integrations</a>
                 <a href="#">Settings</a>
+                <a href="index.html" class="logout" style="margin-top: auto; opacity: 0.7;">Sign Out</a>
             </nav>
         </aside>
 
         <!-- Main Workspace -->
         <main class="workspace">
+            <!-- Universal Top Nav -->
             <header class="topbar">
                 <div class="client-info">
-                    <h2>Apex Heavy Manufacturing</h2>
-                    <span class="status-badge green">System Online</span>
+                    <h2 id="client-name">Loading...</h2>
+                    <span class="status-badge green" id="system-status">System Online</span>
                 </div>
-                <div class="user-profile">Plant Manager Portal</div>
+                <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
+                    <span id="breadcrumb" style="color: var(--text-muted); font-size: 14px;">Dashboard &gt; Overview</span>
+                    <div class="avatar" style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">👤</div>
+                </div>
             </header>
 
-            <!-- Dashboard Grid -->
-            <div class="dashboard-grid">
-                
-                <!-- Business Model Proof: Modules -->
-                <section class="card modules-card">
-                    <h3>Active Modules</h3>
-                    <div class="module-list">
-                        <div class="module-item active">
-                            <span>Telemetry & OEE</span>
-                            <span class="tag">Active</span>
-                        </div>
-                        <div class="module-item active">
-                            <span>Vision Quality Control</span>
-                            <span class="tag">Active</span>
-                        </div>
-                        <div class="module-item inactive">
-                            <span>Predictive Maintenance</span>
-                            <button class="upgrade-btn">Upgrade</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Value Proof: OEE Metrics -->
-                <section class="card metrics-card">
-                    <h3>Overall Equipment Effectiveness (OEE)</h3>
-                    <div class="big-metric">
-                        <span id="oee-score">81.3</span>%
-                    </div>
-                    <div class="sub-metrics">
-                        <div>Availability: <span id="avail-score">94.2%</span></div>
-                        <div>Quality: <span id="qual-score">98.1%</span></div>
-                    </div>
-                </section>
-
-                <!-- Tech Proof: Live Sensors -->
-                <section class="card sensor-card">
-                    <h3>Live Edge Telemetry: CNC_Milling_04</h3>
-                    <div class="sensor-grid">
-                        <div class="sensor-box">
-                            <h4>Spindle Temp</h4>
-                            <div class="sensor-value"><span id="temp-val">62.4</span>°C</div>
-                        </div>
-                        <div class="sensor-box">
-                            <h4>Vibration</h4>
-                            <div class="sensor-value"><span id="vib-val">115.2</span> Hz</div>
-                        </div>
-                        <div class="sensor-box">
-                            <h4>Current Load</h4>
-                            <div class="sensor-value"><span id="amp-val">12.4</span> A</div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Alert System -->
-                <section class="card alert-card" id="alert-container">
-                    <h3>System Alerts</h3>
-                    <div class="alert-feed" id="alert-feed">
-                        <div class="alert normal">All systems operating within normal parameters.</div>
-                    </div>
-                </section>
-
+            <!-- Dynamic Content Container -->
+            <div id="dashboard-content" class="dashboard-grid">
+                <!-- JavaScript will inject widgets here based on selectedModule -->
             </div>
         </main>
     </div>

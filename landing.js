@@ -65,11 +65,15 @@ window.handleAuth = function(event) {
     submitBtn.style.opacity = "0.7";
     
     setTimeout(() => {
-        // Retrieve the company name if they signed up (for custom UX)
+        // Retrieve the company name and module if they signed up
         const companyInput = document.getElementById('company');
+        const moduleSelect = document.getElementById('module-select');
+        
         if (companyInput && companyInput.value) {
-            // Save to localStorage so the dashboard can read it
             localStorage.setItem('companyName', companyInput.value);
+        }
+        if (moduleSelect && moduleSelect.value) {
+            localStorage.setItem('selectedModule', moduleSelect.value);
         }
 
         // REDIRECT TO YOUR DASHBOARD

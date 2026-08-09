@@ -1,64 +1,145 @@
-// Target DOM Elements
-const tempEl = document.getElementById('temp-val');
-const vibEl = document.getElementById('vib-val');
-const ampEl = document.getElementById('amp-val');
-const oeeEl = document.getElementById('oee-score');
-const alertFeed = document.getElementById('alert-feed');
-const alertContainer = document.getElementById('alert-container');
+document.addEventListener('DOMContentLoaded', () => {
+    const content = document.getElementById('dashboard-content');
+    const clientName = document.getElementById('client-name');
+    const dashboardLogo = document.getElementById('dashboard-logo');
+    const breadcrumb = document.getElementById('breadcrumb');
+    const navHome = document.getElementById('nav-home');
 
-// Initial Machine State
-let telemetry = {
-    temp: 62.4,
-    vib: 115.2,
-    amp: 12.4,
-    oee: 81.3
-};
+    // Retrieve data from localStorage
+    const company = localStorage.getItem('companyName') || 'Guest Client';
+    const selectedModule = localStorage.getItem('selectedModule') || 'oee'; 
 
-let anomalyTriggered = false;
-let cycleCount = 0;
+    // Set Header
+    if (clientName) clientName.innerText = company;
 
-// The Ghost Simulator Logic
-function simulateLiveTelemetry() {
-    cycleCount++;
-
-    // Add random noise to simulate sensor data (± 0.5)
-    telemetry.temp += (Math.random() - 0.5);
-    telemetry.vib += (Math.random() - 0.5) * 2;
-    telemetry.amp += (Math.random() - 0.5) * 0.2;
-    telemetry.oee += (Math.random() - 0.5) * 0.1;
-
-    // Trigger Anomaly for the presentation after ~10 seconds
-    if (cycleCount > 5 && !anomalyTriggered) {
-        triggerCriticalAlert();
+    // Inject UI based on module
+    if (selectedModule === 'eduflow') {
+        if (dashboardLogo) dashboardLogo.innerHTML = 'Edu<span>Flow</span>';
+        if (breadcrumb) breadcrumb.innerText = 'Academic Portal > Overview';
+        if (navHome) navHome.innerText = 'Campus Overview';
+        injectAcademicUI(content);
+    } else {
+        // We use VentureOS for industrial as per original CSS/Dashboard
+        if (dashboardLogo) dashboardLogo.innerHTML = 'Venture<span>OS</span>';
+        if (breadcrumb) breadcrumb.innerText = 'Industrial Portal > Overview';
+        if (navHome) navHome.innerText = 'Plant Overview';
+        injectIndustrialUI(content);
     }
+});
 
-    // Update the DOM safely
-    tempEl.innerText = telemetry.temp.toFixed(1);
-    vibEl.innerText = telemetry.vib.toFixed(1);
-    ampEl.innerText = telemetry.amp.toFixed(2);
-    oeeEl.innerText = telemetry.oee.toFixed(1);
+function injectAcademicUI(container) {
+    if (!container) return;
+    container.innerHTML = `
+        <section class="card modules-card" style="grid-column: span 2;">
+            <h3>Active Academic Modules</h3>
+            <div class="module-list" style="display: flex; gap: 15px;">
+                <div class="module-item active" style="flex: 1;">
+                    <span>Student Progress Analytics</span>
+                    <span class="tag">Active</span>
+                </div>
+                <div class="module-item active" style="flex: 1;">
+                    <span>NLP Query Assistant</span>
+                    <span class="tag">Active</span>
+                </div>
+            </div>
+        </section>
 
-    // If anomaly is running, force temp to rise aggressively
-    if (anomalyTriggered) {
-        telemetry.temp += 1.5;
-        tempEl.style.color = '#ef4444'; // Turn text red
-    }
+        <section class="card metrics-card">
+            <h3>Student Cohort Progress</h3>
+            <div class="big-metric">
+                <span id="progress-score">89.4</span>%
+            </div>
+            <div class="sub-metrics">
+                <div>Engagement: <span>92%</span></div>
+                <div>Retention: <span>98%</span></div>
+            </div>
+        </section>
+
+        <section class="card alert-card">
+            <h3>Teacher Alerts</h3>
+            <div class="alert-feed">
+                <div class="alert critical">
+                    3 students in Cohort B are struggling with advanced thermodynamics. Review suggested.
+                </div>
+                <div class="alert normal">All other cohorts tracking above baseline.</div>
+            </div>
+        </section>
+
+        <section class="card sensor-card" style="grid-column: span 2;">
+            <h3>Live NLP Query Stream</h3>
+            <div class="sensor-grid">
+                <div class="sensor-box">
+                    <h4>Calculus Gap Detected</h4>
+                    <div class="sensor-value" style="font-size: 18px;">Auto-tailoring Module 4</div>
+                </div>
+                <div class="sensor-box">
+                    <h4>Physics Q&A Volume</h4>
+                    <div class="sensor-value">1,402 / hr</div>
+                </div>
+                <div class="sensor-box">
+                    <h4>Student Stress Index</h4>
+                    <div class="sensor-value" style="color: var(--accent-green);">Nominal</div>
+                </div>
+            </div>
+        </section>
+    `;
 }
 
-function triggerCriticalAlert() {
-    anomalyTriggered = true;
-    
-    // Visually change the container to look dangerous
-    alertContainer.style.border = "1px solid #ef4444";
+function injectIndustrialUI(container) {
+    if (!container) return;
+    container.innerHTML = `
+        <section class="card modules-card" style="grid-column: span 2;">
+            <h3>Active Industrial Modules</h3>
+            <div class="module-list" style="display: flex; gap: 15px;">
+                <div class="module-item active" style="flex: 1;">
+                    <span>Telemetry & OEE</span>
+                    <span class="tag">Active</span>
+                </div>
+                <div class="module-item active" style="flex: 1;">
+                    <span>Vision Quality Control</span>
+                    <span class="tag">Active</span>
+                </div>
+                <div class="module-item inactive" style="flex: 1;">
+                    <span>Predictive Maintenance</span>
+                    <button class="upgrade-btn">Upgrade</button>
+                </div>
+            </div>
+        </section>
 
-    // Inject the new critical alert into the feed
-    alertFeed.innerHTML = `
-        <div class="alert critical">
-            <strong>CRITICAL:</strong> Spindle Motor Temperature exceeded threshold (85°C). 
-            Estimated bearing failure in 14 minutes.
-        </div>
-        ` + alertFeed.innerHTML;
+        <section class="card metrics-card">
+            <h3>Overall Equipment Effectiveness (OEE)</h3>
+            <div class="big-metric">
+                <span id="oee-score">81.3</span>%
+            </div>
+            <div class="sub-metrics">
+                <div>Availability: <span>94.2%</span></div>
+                <div>Quality: <span>98.1%</span></div>
+            </div>
+        </section>
+
+        <section class="card alert-card">
+            <h3>System Alerts</h3>
+            <div class="alert-feed">
+                <div class="alert normal">All systems operating within normal parameters.</div>
+            </div>
+        </section>
+
+        <section class="card sensor-card" style="grid-column: span 2;">
+            <h3>Live Edge Telemetry: CNC_Milling_04</h3>
+            <div class="sensor-grid">
+                <div class="sensor-box">
+                    <h4>Spindle Temp</h4>
+                    <div class="sensor-value"><span>62.4</span>°C</div>
+                </div>
+                <div class="sensor-box">
+                    <h4>Vibration</h4>
+                    <div class="sensor-value"><span>115.2</span> Hz</div>
+                </div>
+                <div class="sensor-box">
+                    <h4>Current Load</h4>
+                    <div class="sensor-value"><span>12.4</span> A</div>
+                </div>
+            </div>
+        </section>
+    `;
 }
-
-// Run the engine every 2 seconds
-setInterval(simulateLiveTelemetry, 2000);
