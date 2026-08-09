@@ -453,7 +453,7 @@ window.showStudentDetail = async function(docId) {
 
         content.innerHTML = `
             <div style="grid-column: span 2;">
-                <button onclick="injectStudentDetailsUI(document.getElementById('dashboard-content'))" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">← Back to Student List</button>
+                <button onclick="window.injectStudentDetailsUI(document.getElementById('dashboard-content'))" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">← Back to Student List</button>
             </div>
 
             <section class="card" style="grid-column: span 2;">
@@ -489,7 +489,7 @@ window.showStudentDetail = async function(docId) {
     }
 };
 
-function injectStudentDetailsUI(container) {
+window.injectStudentDetailsUI = function injectStudentDetailsUI(container) {
     if (!container) return;
 
     container.innerHTML = `
