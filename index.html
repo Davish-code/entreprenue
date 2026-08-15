@@ -22,6 +22,7 @@
         <div class="nav-links" id="nav-links">
             <a href="#solutions">Solutions</a>
             <a href="#tech">Technology</a>
+            <a href="#pricing">Pricing</a>
             <button class="login-btn" onclick="openModal('login')">Client Login</button>
             <button class="cta-btn" onclick="openModal('signup')">Get Started</button>
         </div>
@@ -318,6 +319,26 @@
                     <button class="action-btn usp-btn-solid" onclick="openModal('signup')">Deploy Academic Portal</button>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+        <div class="section-header text-center">
+            <span class="sub-heading">Transparent Plans</span>
+            <h2>Choose Your Deployment Model</h2>
+            <p>Scale from a single edge node to global enterprise deployment without friction.</p>
+        </div>
+
+        <div class="pricing-tabs">
+            <button class="pricing-tab active" data-model="eduflow">EduFlow AI</button>
+            <button class="pricing-tab" data-model="oee">OEE & Telemetry</button>
+            <button class="pricing-tab" data-model="vision">Vision AI</button>
+            <button class="pricing-tab" data-model="predictive">Predictive Maintenance</button>
+        </div>
+
+        <div class="pricing-grid" id="pricing-grid">
+            <!-- Pricing Cards will be injected by landing.js based on selected tab -->
         </div>
     </section>
 

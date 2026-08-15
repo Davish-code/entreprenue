@@ -1,4 +1,4 @@
-import { db, collection, addDoc, serverTimestamp, getDocs, doc, setDoc, getDoc } from "./firebase-config.js";
+import { db, collection, addDoc, serverTimestamp, getDocs, doc, setDoc, getDoc, updateDoc } from "./firebase-config.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('dashboard-content');
@@ -462,7 +462,10 @@ window.showStudentDetail = async function(docId) {
                         <h3 style="font-size:22px; color:var(--text-main); margin-bottom:4px;">${data.name}</h3>
                         <p style="color:var(--text-muted); font-size:14px;">Reg. No: ${data.regNo || docId} &bull; Branch: ${data.branch || '-'}</p>
                     </div>
-                    <span class="status-badge green">Active</span>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <span class="status-badge green">Active</span>
+                        <button onclick="window.editStudentUI('${docId}')" style="background:rgba(255,255,255,0.05); color:var(--text-main); border:1px solid var(--border-color); padding:6px 16px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; transition:0.2s;">Edit Details</button>
+                    </div>
                 </div>
             </section>
 
@@ -540,3 +543,147 @@ window.injectStudentDetailsUI = function injectStudentDetailsUI(container) {
 
     window.loadStudentsList();
 }
+
+// ----------------------------------------------------
+// Edit Student Logic
+// ----------------------------------------------------
+window.editStudentUI = async function(docId) {
+    const content = document.getElementById('dashboard-content');
+    if (!content) return;
+    
+    content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--text-muted);">Loading student data for edit...</div>';
+    
+    try {
+        const docSnap = await getDoc(doc(db, "eduflow", docId));
+        if (!docSnap.exists()) {
+            content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--accent-red);">Student not found.</div>';
+            return;
+        }
+        const data = docSnap.data();
+        
+        let subjectRowsHTML = '';
+        window.editSubjectCounter = 0;
+        
+        if (Array.isArray(data.subjects) && data.subjects.length > 0) {
+            data.subjects.forEach((s) => {
+                window.editSubjectCounter++;
+                subjectRowsHTML += `
+                    <div class="subject-row" id="edit-subject-row-${window.editSubjectCounter}" style="display:flex; gap:8px; align-items:center;">
+                        <input type="text" placeholder="Subject" value="${s.subject || ''}" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                        <input type="text" placeholder="Marks" value="${s.marks || ''}" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                        <input type="text" placeholder="Attend %" value="${s.attendance || ''}" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                        <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-${window.editSubjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+                    </div>
+                `;
+            });
+        } else {
+            window.editSubjectCounter = 1;
+            subjectRowsHTML = `
+                <div class="subject-row" id="edit-subject-row-1" style="display:flex; gap:8px; align-items:center;">
+                    <input type="text" placeholder="Subject" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                    <input type="text" placeholder="Marks" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                    <input type="text" placeholder="Attend %" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                    <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-1')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+                </div>
+            `;
+        }
+
+        content.innerHTML = `
+            <div style="grid-column: span 2;">
+                <button onclick="window.showStudentDetail('${docId}')" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">← Cancel Edit</button>
+            </div>
+            
+            <section class="card" style="grid-column: span 2;">
+                <h3 style="margin-bottom: 20px;">Edit Student: ${data.name}</h3>
+                <form id="edit-student-form" onsubmit="window.submitEditStudentForm(event, '${docId}')" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:200px;">
+                            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Full Name</label>
+                            <input type="text" id="edit-student-name" value="${data.name || ''}" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                        </div>
+                        <div style="flex:1; min-width:200px;">
+                            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Registration Number (Fixed)</label>
+                            <input type="text" id="edit-student-reg" value="${data.regNo || docId}" disabled style="width:100%; padding:10px; background:rgba(255,255,255,0.02); border:1px solid var(--border-color); color:var(--text-muted); border-radius:4px; cursor:not-allowed;">
+                        </div>
+                        <div style="flex:1; min-width:200px;">
+                            <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:5px;">Branch</label>
+                            <input type="text" id="edit-student-branch" value="${data.branch || ''}" required style="width:100%; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <label style="font-size:12px; color:var(--text-muted);">Subjects, Marks & Attendance</label>
+                            <button type="button" onclick="window.addEditSubjectRow()" style="padding:4px 12px; background:rgba(59,130,246,0.2); color:var(--accent-blue); border:1px solid rgba(59,130,246,0.4); border-radius:4px; cursor:pointer; font-size:16px; font-weight:bold;">+ Add Subject</button>
+                        </div>
+                        <div id="edit-subjects-container" style="display:flex; flex-direction:column; gap:8px;">
+                            ${subjectRowsHTML}
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="save-edit-btn" style="padding:12px; background:var(--accent-green); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:20px; width:100%; max-width:300px;">Save Changes</button>
+                </form>
+            </section>
+        `;
+    } catch (e) {
+        console.error("Error loading student for edit: ", e);
+        content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--accent-red);">Error loading student data. Check console.</div>';
+    }
+};
+
+window.addEditSubjectRow = function() {
+    window.editSubjectCounter++;
+    const container = document.getElementById('edit-subjects-container');
+    if (!container) return;
+    const row = document.createElement('div');
+    row.className = 'subject-row';
+    row.id = `edit-subject-row-${window.editSubjectCounter}`;
+    row.style.cssText = 'display:flex; gap:8px; align-items:center;';
+    row.innerHTML = `
+        <input type="text" placeholder="Subject" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+        <input type="text" placeholder="Marks" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+        <input type="text" placeholder="Attend %" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
+        <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-${window.editSubjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+    `;
+    container.appendChild(row);
+};
+
+window.removeEditSubjectRow = function(rowId) {
+    const row = document.getElementById(rowId);
+    if (row) row.remove();
+};
+
+window.submitEditStudentForm = async function(event, docId) {
+    event.preventDefault();
+    const btn = document.getElementById('save-edit-btn');
+    btn.innerText = "Saving...";
+    btn.disabled = true;
+
+    const name = document.getElementById('edit-student-name').value;
+    const branch = document.getElementById('edit-student-branch').value;
+
+    const rows = document.querySelectorAll('#edit-subjects-container .subject-row');
+    const subjects = [];
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const subName = inputs[0].value.trim();
+        const subMarks = inputs[1].value.trim();
+        const subAttend = inputs[2].value.trim();
+        if (subName && subMarks) {
+            subjects.push({ subject: subName, marks: subMarks, attendance: subAttend || '0' });
+        }
+    });
+
+    try {
+        await updateDoc(doc(db, "eduflow", docId), {
+            name, branch, subjects
+        });
+        alert("Student updated successfully!");
+        window.showStudentDetail(docId); // Go back to view mode
+    } catch (e) {
+        console.error("Error updating student: ", e);
+        alert("Failed to update student. Check console.");
+        btn.innerText = "Save Changes";
+        btn.disabled = false;
+    }
+};

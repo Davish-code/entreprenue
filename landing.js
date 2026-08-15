@@ -261,3 +261,85 @@ if (loginForm) {
         }, 1500); 
     });
 }
+
+// 7. Dynamic Pricing Logic
+const pricingData = {
+    eduflow: {
+        personal: { price: "₹2999", period: "/mo", desc: "For individual tutors or small classrooms.", features: ["Up to 50 students", "Basic NLP Chatbot", "Core Analytics Dashboard"] },
+        business: { price: "₹11,999", period: "/mo", desc: "For mid-sized schools and learning centers.", features: ["Up to 500 students", "Advanced Adaptive Curriculum", "Teacher Alert System", "Priority Support"] },
+        enterprise: { price: "Custom", period: "", desc: "For universities and large school districts.", features: ["Unlimited students", "Custom LLM Fine-tuning", "SIS Integration", "Dedicated Account Manager"] }
+    },
+    oee: {
+        personal: { price: "₹4999", period: "/mo", desc: "For single-machine monitoring.", features: ["1 Edge Node", "Real-time Telemetry", "Basic Uptime Reports"] },
+        business: { price: "₹18,999", period: "/mo", desc: "For small factory floors.", features: ["Up to 10 Edge Nodes", "Automated Shift Reports", "Historical Trends", "Email Alerts"] },
+        enterprise: { price: "Custom", period: "", desc: "For full-scale industrial operations.", features: ["Unlimited Edge Nodes", "ERP/MES Integration", "Custom API Access", "24/7 Support"] }
+    },
+    vision: {
+        personal: { price: "₹2999", period: "/mo", desc: "For basic quality inspection.", features: ["1 Camera Stream", "Standard Defect Detection", "Daily Summary Reports"] },
+        business: { price: "₹9,999", period: "/mo", desc: "For high-speed production lines.", features: ["Up to 5 Camera Streams", "Custom Defect Training", "Sub-millimeter Accuracy", "Automated Reject System"] },
+        enterprise: { price: "Custom", period: "", desc: "For global manufacturing plants.", features: ["Unlimited Streams", "Multi-factory Aggregation", "On-premise Deployment", "Dedicated Engineer"] }
+    },
+    predictive: {
+        personal: { price: "6,999", period: "/mo", desc: "For critical asset monitoring.", features: ["Up to 5 Sensors", "Basic Anomaly Detection", "Maintenance Alerts"] },
+        business: { price: "₹21,999", period: "/mo", desc: "For facility-wide maintenance.", features: ["Up to 50 Sensors", "Advanced Failure Prediction", "Vibration & Thermal Analysis", "Maintenance Scheduling"] },
+        enterprise: { price: "Custom", period: "", desc: "For heavy industry & energy.", features: ["Unlimited Sensors", "Digital Twin Integration", "RUL (Remaining Useful Life) Models", "SLA Guarantee"] }
+    }
+};
+
+function renderPricing(model) {
+    const grid = document.getElementById('pricing-grid');
+    if (!grid) return;
+    const data = pricingData[model];
+    if (!data) return;
+
+    grid.classList.add('fade-out');
+    
+    setTimeout(() => {
+        grid.innerHTML = `
+            <div class="pricing-card">
+                <h3 class="pricing-tier">Personal</h3>
+                <div class="pricing-price">${data.personal.price}<span>${data.personal.period}</span></div>
+                <p class="pricing-desc">${data.personal.desc}</p>
+                <ul class="pricing-features">
+                    ${data.personal.features.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+                <button class="pricing-btn" onclick="openModal('signup', '${model}')">Get Started</button>
+            </div>
+            <div class="pricing-card featured">
+                <h3 class="pricing-tier">Business</h3>
+                <div class="pricing-price">${data.business.price}<span>${data.business.period}</span></div>
+                <p class="pricing-desc">${data.business.desc}</p>
+                <ul class="pricing-features">
+                    ${data.business.features.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+                <button class="pricing-btn" onclick="openModal('signup', '${model}')">Start Free Trial</button>
+            </div>
+            <div class="pricing-card">
+                <h3 class="pricing-tier">Enterprise</h3>
+                <div class="pricing-price">${data.enterprise.price}<span>${data.enterprise.period}</span></div>
+                <p class="pricing-desc">${data.enterprise.desc}</p>
+                <ul class="pricing-features">
+                    ${data.enterprise.features.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+                <button class="pricing-btn" onclick="openModal('signup', '${model}')">Contact Sales</button>
+            </div>
+        `;
+        grid.classList.remove('fade-out');
+    }, 300); // Wait for fade out animation
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Setup Pricing Tabs
+    const tabs = document.querySelectorAll('.pricing-tab');
+    if (tabs.length > 0) {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                renderPricing(tab.getAttribute('data-model'));
+            });
+        });
+        // Initial render
+        renderPricing('eduflow');
+    }
+});
