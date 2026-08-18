@@ -60,31 +60,22 @@ window.handleAuth = function(event) {
     const submitBtn = event.target.querySelector('.submit-btn');
     const originalText = submitBtn.innerText;
     
-    // Simulate network delay for realism
-    submitBtn.innerText = "Authenticating...";
-    submitBtn.style.opacity = "0.7";
+    // Retrieve the company name and module if they signed up
+    const companyInput = document.getElementById('company');
+    const moduleSelect = document.getElementById('module-select');
     
-    setTimeout(() => {
-        // Retrieve the company name and module if they signed up
-        const companyInput = document.getElementById('company');
-        const moduleSelect = document.getElementById('module-select');
-        
-        if (companyInput && companyInput.value) {
-            localStorage.setItem('companyName', companyInput.value);
-        }
-        if (moduleSelect && moduleSelect.value) {
-            localStorage.setItem('selectedModule', moduleSelect.value);
-        }
+    if (companyInput && companyInput.value) {
+        localStorage.setItem('companyName', companyInput.value);
+    }
+    if (moduleSelect && moduleSelect.value) {
+        localStorage.setItem('selectedModule', moduleSelect.value);
+    }
 
-        // REDIRECT TO YOUR DASHBOARD
-        // Ensure your previous file is named dashboard.html
-        window.open('dashboard.html', '_blank');
-        
-        // Reset the button state
-        submitBtn.innerText = originalText;
-        submitBtn.style.opacity = "1";
-        closeModal();
-    }, 1200);
+    // REDIRECT TO YOUR DASHBOARD
+    // Ensure your previous file is named dashboard.html
+    window.open('dashboard.html', '_blank');
+    
+    closeModal();
 }
 
 // Validation for Google SSO Button and Submit Button
@@ -247,18 +238,11 @@ if (loginForm) {
         submitBtn.innerText = "Authenticating...";
         submitBtn.disabled = true;
 
-        // Simulate a secure network delay for realism during your professor's pitch
-        setTimeout(() => {
-            // For the prototype, we simulate a successful Access Key verification
-            alert("Authentication successful. Securing connection to fleet telemetry...");
-            
-            // Redirect to the dashboard
-            window.location.href = "dashboard.html";
-            
-            // Reset button just in case the user navigates back
-            submitBtn.innerText = originalText;
-            submitBtn.disabled = false;
-        }, 1500); 
+        // For the prototype, we simulate a successful Access Key verification
+        alert("Authentication successful. Securing connection to fleet telemetry...");
+        
+        // Redirect to the dashboard
+        window.location.href = "dashboard.html"; 
     });
 }
 
