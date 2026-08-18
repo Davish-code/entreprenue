@@ -446,8 +446,8 @@ body::after {
 /* Solutions Section */
 .solutions-section {
     padding: 100px 5%;
-    background-color: var(--bg-dark);
-    border-top: 1px solid var(--border-color);
+    background-color: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .section-header {
@@ -563,8 +563,8 @@ body::after {
 /* Pipeline Section (How it Works) */
 .pipeline-section {
     padding: 100px 5%;
-    background-color: var(--panel-dark);
-    border-top: 1px solid var(--border-color);
+    background-color: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .pipeline-container {
@@ -636,8 +636,9 @@ body::after {
 /* ROI Section */
 .roi-section {
     padding: 100px 5%;
-    background: linear-gradient(135deg, #0f172a 0%, #070b14 100%);
-    border-top: 1px solid var(--border-color);
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
 }
 
@@ -703,8 +704,8 @@ body::after {
 /* Modules in Action Section */
 .action-section {
     padding: 100px 5%;
-    background-color: var(--bg-dark);
-    border-top: 1px solid var(--border-color);
+    background-color: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .action-grid {
@@ -797,9 +798,10 @@ body::after {
 /* R&D Credibility Section */
 .rnd-section {
     padding: 80px 5%;
-    background: linear-gradient(90deg, var(--bg-dark) 0%, var(--panel-dark) 100%);
-    border-top: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .rnd-container {
