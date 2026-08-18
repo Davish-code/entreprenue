@@ -117,3 +117,23 @@ nav a:hover, nav a.active { background-color: rgba(255, 255, 255, 0.05); color: 
     70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
     100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .sensor-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    body { overflow-y: auto; }
+    .layout { flex-direction: column; height: auto; min-height: 100vh; overflow-y: visible; }
+    .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 15px; }
+    .logo { margin-bottom: 15px; text-align: center; }
+    nav#sidebar-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    nav#sidebar-nav a { margin-bottom: 0; padding: 8px 12px; }
+    .topbar { padding: 15px 20px; flex-direction: column; align-items: flex-start; gap: 15px; }
+    .dashboard-grid { padding: 20px; overflow-y: visible; }
+    .sensor-grid { grid-template-columns: 1fr; }
+    .module-list { flex-direction: column !important; }
+    .sub-metrics { flex-direction: column; gap: 10px; }
+}
