@@ -208,10 +208,23 @@ if (googleSsoBtn) {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             
+            const companyInput = document.getElementById('company');
+            const moduleSelect = document.getElementById('module-select');
+            
+            const companyName = companyInput && companyInput.value ? companyInput.value : "Google Auth User";
+            const selectedModule = moduleSelect && moduleSelect.value ? moduleSelect.value : "To Be Determined";
+            
+            if (companyInput && companyInput.value) {
+                localStorage.setItem('companyName', companyInput.value);
+            }
+            if (moduleSelect && moduleSelect.value) {
+                localStorage.setItem('selectedModule', moduleSelect.value);
+            }
+            
             await addDoc(collection(db, "enterprise_pilots"), {
-                companyName: "Google Auth User", 
+                companyName: companyName, 
                 workEmail: user.email,
-                selectedModule: "To Be Determined",
+                selectedModule: selectedModule,
                 authMethod: "Google SSO",
                 uid: user.uid,
                 status: "Pending Deployment",
