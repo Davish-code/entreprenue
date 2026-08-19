@@ -1,4 +1,4 @@
-import { db, auth, onAuthStateChanged, signOut, collection, addDoc, serverTimestamp, getDocs, doc, setDoc, getDoc, updateDoc } from "./firebase-config.js";
+import { db, auth, onAuthStateChanged, signOut, collection, addDoc, serverTimestamp, getDocs, doc, setDoc, getDoc, updateDoc, query, where, limit } from "./firebase-config.js";
 
 let currentUser = null;
 
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function initDashboard() {
+async function initDashboard() {
     const content = document.getElementById('dashboard-content');
     const clientName = document.getElementById('client-name');
     const dashboardLogo = document.getElementById('dashboard-logo');
@@ -32,9 +32,26 @@ function initDashboard() {
     const navHome = document.getElementById('nav-home');
     const navStudents = document.getElementById('nav-students');
 
-    // Retrieve data from localStorage
-    const company = localStorage.getItem('companyName') || 'Guest Client';
-    const selectedModule = localStorage.getItem('selectedModule') || 'oee'; 
+    // Fetch user info from Firestore first
+    let company = 'Guest Client';
+    let selectedModule = 'oee';
+    
+    try {
+        const q = query(collection(db, "enterprise_pilots"), where("uid", "==", currentUser.uid), limit(1));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            const data = querySnapshot.docs[0].data();
+            company = data.companyName || company;
+            selectedModule = data.selectedModule || selectedModule;
+        } else {
+            company = localStorage.getItem('companyName') || company;
+            selectedModule = localStorage.getItem('selectedModule') || selectedModule;
+        }
+    } catch(e) {
+        console.error("Error fetching user info:", e);
+        company = localStorage.getItem('companyName') || company;
+        selectedModule = localStorage.getItem('selectedModule') || selectedModule;
+    }
 
     // Set Header
     if (clientName) clientName.innerText = company;
