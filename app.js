@@ -397,9 +397,9 @@ window.submitStudentForm = async function(event) {
     });
 
     try {
-        // Use regNo as document ID in user's isolated subcollection
-        await setDoc(doc(db, "users", currentUser.uid, "eduflow", regNo), {
-            name, regNo, branch, subjects, timestamp: serverTimestamp()
+        // Use regNo as document ID in global eduflow collection, but link via uid field
+        await setDoc(doc(db, "eduflow", regNo), {
+            name, regNo, branch, subjects, uid: currentUser.uid, timestamp: serverTimestamp()
         });
         alert("Student added successfully!");
         document.getElementById('student-form').reset();
@@ -431,7 +431,8 @@ window.loadStudentsList = async function() {
     listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">Loading students...</p>';
 
     try {
-        const querySnapshot = await getDocs(collection(db, "users", currentUser.uid, "eduflow"));
+        const q = query(collection(db, "eduflow"), where("uid", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
         listContainer.innerHTML = '';
         if (querySnapshot.empty) {
             listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">No students found.</p>';
@@ -468,8 +469,8 @@ window.showStudentDetail = async function(docId) {
     content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--text-muted);">Loading student data...</div>';
 
     try {
-        const docSnap = await getDoc(doc(db, "users", currentUser.uid, "eduflow", docId));
-        if (!docSnap.exists()) {
+        const docSnap = await getDoc(doc(db, "eduflow", docId));
+        if (!docSnap.exists() || docSnap.data().uid !== currentUser.uid) {
             content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--accent-red);">Student not found.</div>';
             return;
         }
@@ -595,8 +596,8 @@ window.editStudentUI = async function(docId) {
     content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--text-muted);">Loading student data for edit...</div>';
     
     try {
-        const docSnap = await getDoc(doc(db, "users", currentUser.uid, "eduflow", docId));
-        if (!docSnap.exists()) {
+        const docSnap = await getDoc(doc(db, "eduflow", docId));
+        if (!docSnap.exists() || docSnap.data().uid !== currentUser.uid) {
             content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--accent-red);">Student not found.</div>';
             return;
         }
@@ -716,7 +717,7 @@ window.submitEditStudentForm = async function(event, docId) {
     });
 
     try {
-        await updateDoc(doc(db, "users", currentUser.uid, "eduflow", docId), {
+        await updateDoc(doc(db, "eduflow", docId), {
             name, branch, subjects
         });
         alert("Student updated successfully!");
