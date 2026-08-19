@@ -53,29 +53,68 @@ window.switchView = function(type) {
     }
 }
 
-// Handle Form Submission (The Prototype Redirection)
-window.handleAuth = function(event) {
+window.handleAuth = async function(event) {
     event.preventDefault(); // Prevent page reload
     
-    const submitBtn = event.target.querySelector('.submit-btn');
+    const form = event.target;
+    const submitBtn = form.querySelector('.submit-btn');
     const originalText = submitBtn.innerText;
     
-    // Retrieve the company name and module if they signed up
-    const companyInput = document.getElementById('company');
-    const moduleSelect = document.getElementById('module-select');
+    // Check if it's signup or login
+    const isSignup = form.closest('#signup-form') !== null;
     
-    if (companyInput && companyInput.value) {
-        localStorage.setItem('companyName', companyInput.value);
-    }
-    if (moduleSelect && moduleSelect.value) {
-        localStorage.setItem('selectedModule', moduleSelect.value);
-    }
+    if (isSignup) {
+        const companyInput = document.getElementById('company');
+        const moduleSelect = document.getElementById('module-select');
+        const emailInput = document.getElementById('signup-email');
+        const passwordInput = document.getElementById('signup-password');
+        
+        if (companyInput && companyInput.value) {
+            localStorage.setItem('companyName', companyInput.value);
+        }
+        if (moduleSelect && moduleSelect.value) {
+            localStorage.setItem('selectedModule', moduleSelect.value);
+        }
 
-    // REDIRECT TO YOUR DASHBOARD
-    // Ensure your previous file is named dashboard.html
-    window.open('dashboard.html', '_blank');
-    
-    closeModal();
+        submitBtn.innerText = "Provisioning...";
+        submitBtn.disabled = true;
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+            const user = userCredential.user;
+            
+            await addDoc(collection(db, "enterprise_pilots"), {
+                companyName: companyInput.value,
+                workEmail: user.email,
+                selectedModule: moduleSelect.value,
+                authMethod: "Manual Email/Password",
+                uid: user.uid,
+                status: "Pending Deployment",
+                timestamp: serverTimestamp()
+            });
+            
+            console.log("Pilot requested for UID: ", user.uid);
+            alert("Success! Your pilot environment is being provisioned.");
+            window.location.href = "dashboard.html"; 
+        } catch (error) {
+            console.error("Error signing up: ", error);
+            alert("Error: " + error.message);
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    } else {
+        // Login Logic
+        const emailInput = form.querySelector('input[type="email"]');
+        const passwordInput = form.querySelector('input[type="password"]');
+        
+        submitBtn.innerText = "Authenticating...";
+        submitBtn.disabled = true;
+
+        // In a full implementation, you would use signInWithEmailAndPassword here
+        // For now we'll just alert and redirect as requested by the prototype
+        alert("Authentication successful. Securing connection to fleet telemetry...");
+        window.location.href = "dashboard.html"; 
+    }
 }
 
 // Validation for Google SSO Button and Submit Button
@@ -157,45 +196,9 @@ function showSlides(n) {
 
 // --- FIREBASE BACKEND INTEGRATION ---
 
-// 1. Import Firebase dependencies from shared config
-import { db, auth, provider, collection, addDoc, serverTimestamp } from "./firebase-config.js";
+import { db, auth, provider, collection, addDoc, serverTimestamp, createUserWithEmailAndPassword } from "./firebase-config.js";
 
-// 4. Handle Standard Form Submission
-const pilotForm = document.getElementById('pilot-form');
-if (pilotForm) {
-    pilotForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); 
-        
-        const company = document.getElementById('company-name').value;
-        const email = document.getElementById('work-email').value;
-        const module = document.getElementById('module-select').value;
-        
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        submitBtn.innerText = "Provisioning...";
-        submitBtn.disabled = true;
-
-        try {
-            const docRef = await addDoc(collection(db, "enterprise_pilots"), {
-                companyName: company,
-                workEmail: email,
-                selectedModule: module,
-                authMethod: "Manual Email",
-                status: "Pending Deployment",
-                timestamp: serverTimestamp()
-            });
-            
-            console.log("Pilot requested with ID: ", docRef.id);
-            alert("Success! Your pilot environment is being provisioned. Our team will contact you shortly.");
-            window.location.href = "dashboard.html"; 
-            
-        } catch (error) {
-            console.error("Error adding document: ", error);
-            alert("Error provisioning database. Please check console.");
-            submitBtn.innerText = "Provision Dashboard";
-            submitBtn.disabled = false;
-        }
-    });
-}
+// Standard Form Submission logic moved to handleAuth
 
 // 5. Handle Google Workspace SSO
 const googleSsoBtn = document.getElementById('google-sso-btn');
@@ -225,26 +228,7 @@ if (googleSsoBtn) {
     });
 }
 
-// 6. Handle Client Login Form Submission
-const loginForm = document.getElementById('login-form');
-
-if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Stop the page from refreshing
-
-        // Grab the button to show a loading state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerText;
-        submitBtn.innerText = "Authenticating...";
-        submitBtn.disabled = true;
-
-        // For the prototype, we simulate a successful Access Key verification
-        alert("Authentication successful. Securing connection to fleet telemetry...");
-        
-        // Redirect to the dashboard
-        window.location.href = "dashboard.html"; 
-    });
-}
+// Login form submission logic moved to handleAuth
 
 // 7. Dynamic Pricing Logic
 const pricingData = {
