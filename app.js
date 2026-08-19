@@ -1,6 +1,30 @@
-import { db, collection, addDoc, serverTimestamp, getDocs, doc, setDoc, getDoc, updateDoc } from "./firebase-config.js";
+import { db, auth, onAuthStateChanged, signOut, collection, addDoc, serverTimestamp, getDocs, doc, setDoc, getDoc, updateDoc } from "./firebase-config.js";
+
+let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            initDashboard();
+        } else {
+            // Redirect to login if not authenticated
+            window.location.href = 'index.html';
+        }
+    });
+
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            signOut(auth).then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => console.error("Sign out error", error));
+        });
+    }
+});
+
+function initDashboard() {
     const content = document.getElementById('dashboard-content');
     const clientName = document.getElementById('client-name');
     const dashboardLogo = document.getElementById('dashboard-logo');
@@ -56,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             injectOEEUI(content);
         }
     }
-});
+}
 
 function injectAcademicUI(container) {
     if (!container) return;
@@ -356,8 +380,8 @@ window.submitStudentForm = async function(event) {
     });
 
     try {
-        // Use regNo as document ID so each student gets their own named document
-        await setDoc(doc(db, "eduflow", regNo), {
+        // Use regNo as document ID in user's isolated subcollection
+        await setDoc(doc(db, "users", currentUser.uid, "eduflow", regNo), {
             name, regNo, branch, subjects, timestamp: serverTimestamp()
         });
         alert("Student added successfully!");
@@ -390,7 +414,7 @@ window.loadStudentsList = async function() {
     listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">Loading students...</p>';
 
     try {
-        const querySnapshot = await getDocs(collection(db, "eduflow"));
+        const querySnapshot = await getDocs(collection(db, "users", currentUser.uid, "eduflow"));
         listContainer.innerHTML = '';
         if (querySnapshot.empty) {
             listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:20px;">No students found.</p>';
@@ -427,7 +451,7 @@ window.showStudentDetail = async function(docId) {
     content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--text-muted);">Loading student data...</div>';
 
     try {
-        const docSnap = await getDoc(doc(db, "eduflow", docId));
+        const docSnap = await getDoc(doc(db, "users", currentUser.uid, "eduflow", docId));
         if (!docSnap.exists()) {
             content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--accent-red);">Student not found.</div>';
             return;
@@ -554,7 +578,7 @@ window.editStudentUI = async function(docId) {
     content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--text-muted);">Loading student data for edit...</div>';
     
     try {
-        const docSnap = await getDoc(doc(db, "eduflow", docId));
+        const docSnap = await getDoc(doc(db, "users", currentUser.uid, "eduflow", docId));
         if (!docSnap.exists()) {
             content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--accent-red);">Student not found.</div>';
             return;
@@ -675,7 +699,7 @@ window.submitEditStudentForm = async function(event, docId) {
     });
 
     try {
-        await updateDoc(doc(db, "eduflow", docId), {
+        await updateDoc(doc(db, "users", currentUser.uid, "eduflow", docId), {
             name, branch, subjects
         });
         alert("Student updated successfully!");
