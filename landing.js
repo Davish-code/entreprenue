@@ -200,7 +200,7 @@ import { db, auth, provider, collection, addDoc, serverTimestamp, createUserWith
 
 // Standard Form Submission logic moved to handleAuth
 
-// 5. Handle Google Workspace SSO
+// 5. Handle Google Workspace SSO (Signup)
 const googleSsoBtn = document.getElementById('google-sso-btn');
 if (googleSsoBtn) {
     googleSsoBtn.addEventListener('click', async () => {
@@ -219,6 +219,24 @@ if (googleSsoBtn) {
             });
 
             alert(`Authenticated successfully as ${user.email}`);
+            window.location.href = "dashboard.html";
+            
+        } catch (error) {
+            console.error("SSO Failed: ", error.message);
+            alert("Authentication failed. Please try again.");
+        }
+    });
+}
+
+// 5b. Handle Google Workspace SSO (Login)
+const googleLoginSsoBtn = document.getElementById('google-login-sso-btn');
+if (googleLoginSsoBtn) {
+    googleLoginSsoBtn.addEventListener('click', async () => {
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            
+            alert(`Logged in successfully as ${user.email}`);
             window.location.href = "dashboard.html";
             
         } catch (error) {
