@@ -196,7 +196,7 @@ function showSlides(n) {
 
 // --- FIREBASE BACKEND INTEGRATION ---
 
-import { db, auth, provider, collection, addDoc, serverTimestamp, createUserWithEmailAndPassword } from "./firebase-config.js";
+import { db, auth, provider, collection, addDoc, serverTimestamp, createUserWithEmailAndPassword, signInWithPopup } from "./firebase-config.js";
 
 // Standard Form Submission logic moved to handleAuth
 
