@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions | SyncForge</title>
+    <link rel="stylesheet" href="landing.css">
+    <style>
+        .terms-container {
+            max-width: 800px;
+            margin: 120px auto 60px;
+            padding: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        .terms-title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--primary-light);
+        }
+
+        .terms-content {
+            color: var(--text-secondary, #b3b3b3);
+            line-height: 1.6;
+        }
+
+        .terms-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .terms-section:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .terms-section h2 {
+            color: var(--text-primary, #ffffff);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            margin-top: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        .terms-section ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .terms-section li {
+            margin-bottom: 0.8rem;
+        }
+
+        .terms-section p {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar (Simplified) -->
+    <nav class="navbar">
+        <div class="nav-header">
+            <div class="logo">Sync<span>Forge</span></div>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Back to Home</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="terms-container">
+        <a href="index.html" class="back-link">&larr; Back</a>
+        <h1 class="terms-title">Terms and Conditions</h1>
+        
+        <!-- Empty Content Area for terms -->
+        <div class="terms-content">
+            <section class="terms-section">
+                <h2>1. DEFINITIONS AND SCOPE OF SERVICES</h2>
+                <ul>
+                    <li>SyncForge Enterprises: MASTER TERMS OF SERVICE</li>
+                    <li>Last Updated: August 20, 2026</li>
+                    <li>These Master Terms of Service ("Terms") govern your access to and use of the SyncForge AI ecosystem, including the SyncForge Industrial platform, the EduFlow Academic Portal, proprietary Edge-Inference hardware, and associated NLP interfaces (collectively, the "Services"). By deploying, accessing, or utilizing our Services, you (the "Client") agree to be bound by this agreement.</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>2. DATA OWNERSHIP AND PRIVACY</h2>
+                <ul>
+                    <li>Given our dual-domain architecture, data governance is strictly bifurcated:</li>
+                    <li>Industrial Telemetry (SyncForge Industrial): All raw sensor data, machine logs, and production metrics remain the exclusive intellectual property of the Client. SyncForge agrees to treat all such data as highly confidential trade secrets.</li>
+                    <li>Academic Records (EduFlow): Processing of student data complies strictly with applicable regional educational privacy laws. SyncForge acts purely as a data processor. We do not sell, distribute, or independently monetize personally identifiable information (PII) of students or educators.</li>
+                    <li>Anonymized Aggregation: SyncForge retains the right to use fully anonymized, aggregated data from both domains to improve our core AI algorithms, NLP models, and general platform performance across the network.</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>3. INTELLECTUAL PROPERTY & AI MODEL TRAINING</h2>
+                <ul>
+                    <li>Platform IP: SyncForge Enterprises retains all ownership, title, and intellectual property rights to the software, source code, dashboard layouts, and underlying AI architecture.</li>
+                    <li>Model Weights & Inference: While the Client owns their raw data, the specific dynamic baseline models, algorithmic weights, and predictive logic trained during your deployment remain the exclusive property of SyncForge. Terminating this agreement does not grant the Client access to the underlying trained machine learning models.</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>4. HARDWARE LIABILITY AND EDGE DEPLOYMENT</h2>
+                <ul>
+                    <li>If your deployment requires SyncForge Edge Hardware, the equipment is leased to you for the duration of the pilot or contract.</li>
+                    <li>The Client is responsible for providing a secure physical environment, stable power, and standard network configurations for the hardware.</li>
+                    <li>SyncForge is not liable for data loss or inference failure caused by the Client's internal network outages, physical damage to the hardware, or unauthorized tampering.</li>
+                </ul>
+            </section>
+            
+            <section class="terms-section">
+                <h2>5. ACCEPTABLE USE AND RESTRICTIONS</h2>
+                <p>The Client shall not, nor permit any third party to:</p>
+                <ul>
+                    <li>Reverse-engineer, decompile, disassemble, or attempt to derive the source code or underlying NLP architecture of the Services.</li>
+                    <li>Use the Services to process highly classified government/military data or un-anonymized medical records without a separate, customized enterprise agreement.</li>
+                    <li>Intentionally feed adversarial data or malicious code into the SyncForge engine to corrupt the dynamic baselining process.</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>6. LIMITATION OF LIABILITY (CRITICAL WARNING)</h2>
+                <p>SyncForge is an advisory and predictive tool, not a replacement for human oversight or operational insurance.</p>
+                <ul>
+                    <li>Industrial Scope: We do not guarantee 100% accuracy in anomaly detection or machine failure prediction. SyncForge is not liable for factory downtime, loss of profits, equipment destruction, or physical injury resulting from a failure to predict an event, or from actions taken based on our predictive alerts.</li>
+                    <li>Academic Scope: We are not liable for a student's failure to meet academic standards, pass examinations, or graduate, regardless of the interventions suggested by the EduFlow portal.</li>
+                    <li>Maximum Liability: In no event shall SyncForge’s total cumulative liability exceed the total amount paid by the Client to SyncForge in the three (3) months preceding the incident.</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>7. SERVICE LEVEL AGREEMENT (SLA)</h2>
+                <ul>
+                    <li>SyncForge targets a 99.9% uptime for cloud-sync operations and web portal access.</li>
+                    <li>In the event of a total internet outage at the deployment site, SyncForge Edge-Inference is designed to continue functioning locally, storing telemetry until network connection is restored. We are not responsible for alert delays caused by local ISP failures.</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>8. TERMINATION</h2>
+                <p>Either party may terminate this agreement with a 30-day written notice. Upon termination, SyncForge will securely wipe all proprietary Client data from our cloud servers within 60 days. The Client must return all deployed Edge Hardware within 14 days of termination.</p>
+            </section>
+            
+            <section class="terms-section">
+                <h2>9. GOVERNING LAW AND JURISDICTION</h2>
+                <p>These Terms shall be governed by and construed in accordance with the laws of India. Any disputes arising from these Terms or the use of SyncForge Services shall be subject to the exclusive jurisdiction of the courts located in Andhra Pradesh.</p>
+            </section>
+        </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">Sync<span>Forge</span></div>
+            <p>&copy; 2026 SyncForge. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
