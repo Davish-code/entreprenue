@@ -480,17 +480,25 @@ window.showStudentDetail = async function(docId) {
         let subjectRows = '';
         if (Array.isArray(data.subjects) && data.subjects.length > 0) {
             data.subjects.forEach((s, i) => {
+                const subjStr = (s.subject || '').replace(/'/g, "\\'");
+                const nameStr = (data.name || '').replace(/'/g, "\\'");
+                const regStr = (data.regNo || docId).replace(/'/g, "\\'");
                 subjectRows += `
                     <tr>
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">${i + 1}</td>
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">${s.subject}</td>
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">${s.marks}</td>
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">${s.attendance || '0'}%</td>
+                        <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">
+                            <button onclick="window.openAnalysisModal('${subjStr}', '${s.marks}', '${s.attendance || '0'}%', '${nameStr}', '${regStr}')" style="padding: 6px 12px; border-radius: 8px; background: rgba(37,99,235,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#2563eb'; this.style.color='white';" onmouseout="this.style.background='rgba(37,99,235,0.2)'; this.style.color='#60a5fa';">
+                                Analyze ↗
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
         } else {
-            subjectRows = '<tr><td colspan="4" style="text-align:center; padding:15px; color:var(--text-muted);">No subjects recorded.</td></tr>';
+            subjectRows = '<tr><td colspan="5" style="text-align:center; padding:15px; color:var(--text-muted);">No subjects recorded.</td></tr>';
         }
 
         content.innerHTML = `
@@ -520,6 +528,7 @@ window.showStudentDetail = async function(docId) {
                             <th style="padding:10px 12px;">Subject</th>
                             <th style="padding:10px 12px;">Marks</th>
                             <th style="padding:10px 12px;">Attendance</th>
+                            <th style="padding:10px 12px;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -728,4 +737,51 @@ window.submitEditStudentForm = async function(event, docId) {
         btn.innerText = "Save Changes";
         btn.disabled = false;
     }
+};
+
+// --- AI GAP ANALYSIS MODAL LOGIC ---
+window.openAnalysisModal = function(subject, marks, attendance, name, regNo) {
+    const modal = document.getElementById('analysis-modal');
+    if (!modal) return;
+    
+    document.getElementById('analysis-subtitle').innerText = `Diagnosing ${subject} for ${name} (${regNo})`;
+    document.getElementById('analysis-score-badge').innerText = `Score: ${marks}/100`;
+    document.getElementById('analysis-attend-badge').innerText = `Attendance: ${attendance}`;
+    
+    // Reset state
+    document.getElementById('upload-label').innerText = 'Upload Student CAT-1 Answer Sheet (PDF)';
+    document.getElementById('analysis-loading').style.display = 'none';
+    document.getElementById('analysis-results').style.display = 'none';
+    document.getElementById('run-analysis-btn').style.display = 'block';
+    document.getElementById('file-upload').value = '';
+    
+    modal.style.display = 'flex';
+};
+
+window.closeAnalysisModal = function() {
+    const modal = document.getElementById('analysis-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.handleFileUpload = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        document.getElementById('upload-label').innerText = file.name;
+    }
+};
+
+window.runSubjectAnalysis = async function() {
+    const runBtn = document.getElementById('run-analysis-btn');
+    const loading = document.getElementById('analysis-loading');
+    const results = document.getElementById('analysis-results');
+    
+    runBtn.style.display = 'none';
+    loading.style.display = 'block';
+    results.style.display = 'none';
+    
+    // Simulate AI processing delay
+    setTimeout(() => {
+        loading.style.display = 'none';
+        results.style.display = 'block';
+    }, 2500);
 };
