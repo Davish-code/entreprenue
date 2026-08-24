@@ -637,7 +637,7 @@ window.showStudentDetail = async function(docId) {
 
         content.innerHTML = `
             <div style="grid-column: span 2;">
-                <button onclick="window.injectStudentDetailsUI(document.getElementById('dashboard-content'))" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">â† Back to Student List</button>
+                <button onclick="window.injectStudentDetailsUI(document.getElementById('dashboard-content'))" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">← Back to Student List</button>
             </div>
 
             <section class="card" style="grid-column: span 2;">
@@ -835,7 +835,7 @@ window.editStudentUI = async function(docId) {
 
         content.innerHTML = `
             <div style="grid-column: span 2;">
-                <button onclick="window.showStudentDetail('${docId}')" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">â† Cancel Edit</button>
+                <button onclick="window.showStudentDetail('${docId}')" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">← Cancel Edit</button>
             </div>
             
             <section class="card" style="grid-column: span 2;">
