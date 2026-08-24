@@ -539,7 +539,57 @@ window.showStudentDetail = async function(docId) {
                     </tbody>
                 </table>
             </section>
+            
+            <section class="card" id="diagnostic-history-section" style="grid-column: span 2;">
+                <h3 style="margin-bottom:15px;">Diagnostic History</h3>
+                <div id="diagnostic-history-container">
+                    <p style="color:var(--text-muted); font-size:14px; text-align:center; padding:20px;">Loading history...</p>
+                </div>
+            </section>
         `;
+
+        // Fetch Diagnostic History asynchronously to avoid blocking the main UI render
+        setTimeout(async () => {
+            const histContainer = document.getElementById('diagnostic-history-container');
+            if (!histContainer) return;
+
+            try {
+                const diagSnap = await getDocs(collection(db, "students", docId, "diagnostics"));
+                let historyHTML = '';
+                
+                if (!diagSnap.empty) {
+                    const docs = [];
+                    diagSnap.forEach(d => docs.push(d.data()));
+                    // Sort descending by date
+                    docs.sort((a, b) => {
+                        const tA = a.created_at ? a.created_at.toMillis() : 0;
+                        const tB = b.created_at ? b.created_at.toMillis() : 0;
+                        return tB - tA;
+                    });
+                    
+                    docs.forEach(d => {
+                        const dateStr = d.created_at ? d.created_at.toDate().toLocaleString() : 'Just now';
+                        historyHTML += `
+                            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; padding:16px; margin-bottom:12px;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                                    <span style="color:#60a5fa; font-weight:600; font-size:14px;">${d.subject} <span style="color: #94a3b8; font-weight: normal; margin-left: 8px;">(Score: ${d.marks}, Attend: ${d.attendance}%)</span></span>
+                                    <span style="color:var(--text-muted); font-size:12px;">${dateStr}</span>
+                                </div>
+                                <div style="color:#cbd5e1; font-size:14px; line-height:1.6; overflow-x: auto;">
+                                    ${parseMarkdown(d.analysis_report)}
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    historyHTML = '<p style="color:var(--text-muted); font-size:14px; text-align:center; padding:20px;">No diagnostic history available for this student.</p>';
+                }
+                histContainer.innerHTML = historyHTML;
+            } catch (err) {
+                console.error("Failed to load history:", err);
+                histContainer.innerHTML = '<p style="color:#ef4444; font-size:14px; text-align:center; padding:20px;">Failed to load diagnostic history.</p>';
+            }
+        }, 0);
     } catch (e) {
         console.error("Error loading student: ", e);
         content.innerHTML = '<div style="grid-column:span 2; text-align:center; padding:40px; color:var(--accent-red);">Error loading student. Check console.</div>';
