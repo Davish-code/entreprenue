@@ -103,60 +103,178 @@ async function initDashboard() {
 
 function injectAcademicUI(container) {
     if (!container) return;
+
+    // 1. Initial Loading State
     container.innerHTML = `
-        <section class="card modules-card" style="grid-column: span 2;">
-            <h3>Active Academic Modules</h3>
-            <div class="module-list" style="display: flex; gap: 15px;">
-                <div class="module-item active" style="flex: 1;">
-                    <span>Student Progress Analytics</span>
-                    <span class="tag">Active</span>
-                </div>
-                <div class="module-item active" style="flex: 1;">
-                    <span>NLP Query Assistant</span>
-                    <span class="tag">Active</span>
-                </div>
+        <div style="grid-column: span 2; display:flex; flex-direction:column; justify-content:center; align-items:center; height: 300px; gap:20px;">
+            <div style="color:var(--text-muted); font-size:15px; display:flex; align-items:center; gap:10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                Analyzing campus data...
             </div>
-        </section>
-
-        <section class="card metrics-card">
-            <h3>Student Cohort Progress</h3>
-            <div class="big-metric">
-                <span id="progress-score">89.4</span>%
-            </div>
-            <div class="sub-metrics">
-                <div>Engagement: <span>92%</span></div>
-                <div>Retention: <span>98%</span></div>
-            </div>
-        </section>
-
-        <section class="card alert-card">
-            <h3>Teacher Alerts</h3>
-            <div class="alert-feed">
-                <div class="alert critical">
-                    3 students in Cohort B are struggling with advanced thermodynamics. Review suggested.
-                </div>
-                <div class="alert normal">All other cohorts tracking above baseline.</div>
-            </div>
-        </section>
-
-        <section class="card sensor-card" style="grid-column: span 2;">
-            <h3>Live NLP Query Stream</h3>
-            <div class="sensor-grid">
-                <div class="sensor-box">
-                    <h4>Calculus Gap Detected</h4>
-                    <div class="sensor-value" style="font-size: 18px;">Auto-tailoring Module 4</div>
-                </div>
-                <div class="sensor-box">
-                    <h4>Physics Q&A Volume</h4>
-                    <div class="sensor-value">1,402 / hr</div>
-                </div>
-                <div class="sensor-box">
-                    <h4>Student Stress Index</h4>
-                    <div class="sensor-value" style="color: var(--accent-green);">Nominal</div>
-                </div>
-            </div>
-        </section>
+        </div>
     `;
+
+    // 2. Fetch Data Asynchronously
+    setTimeout(async () => {
+        try {
+            // Fetch all students for this user
+            const studentsQuery = query(collection(db, "eduflow"), where("uid", "==", currentUser.uid));
+            const studentsSnap = await getDocs(studentsQuery);
+            
+            let totalMarks = 0;
+            let totalAttendance = 0;
+            let subjectCount = 0;
+            let studentsCount = 0;
+            
+            let criticalAlerts = [];
+            
+            const diagnosticsPromises = [];
+
+            studentsSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                studentsCount++;
+                
+                // Calculate averages & generate alerts
+                if (data.subjects && data.subjects.length > 0) {
+                    data.subjects.forEach(s => {
+                        const mark = parseFloat(s.marks) || 0;
+                        const att = parseFloat(s.attendance) || 0;
+                        
+                        totalMarks += mark;
+                        totalAttendance += att;
+                        subjectCount++;
+                        
+                        if (mark < 40) {
+                            criticalAlerts.push(`<b>${data.name}</b> is failing ${s.subject} (Score: ${mark}). Review suggested.`);
+                        }
+                        if (att < 75) {
+                            criticalAlerts.push(`<b>${data.name}</b> has low attendance in ${s.subject} (${att}%). Early intervention needed.`);
+                        }
+                    });
+                }
+                
+                // Queue diagnostic fetch
+                const diagQuery = query(collection(db, "students", docSnap.id, "diagnostics"));
+                diagnosticsPromises.push(getDocs(diagQuery).then(snap => {
+                    const docs = [];
+                    snap.forEach(d => {
+                        const dData = d.data();
+                        dData.studentName = data.name; // Tag with student name
+                        docs.push(dData);
+                    });
+                    return docs;
+                }));
+            });
+
+            // Calculate overall metrics
+            const avgMarks = subjectCount > 0 ? (totalMarks / subjectCount).toFixed(1) : 0;
+            const avgAttendance = subjectCount > 0 ? (totalAttendance / subjectCount).toFixed(1) : 0;
+            
+            // Generate Alerts HTML
+            let alertsHTML = '';
+            if (criticalAlerts.length > 0) {
+                // Show up to 3 alerts
+                criticalAlerts.slice(0, 3).forEach(alertText => {
+                    alertsHTML += `<div class="alert critical" style="margin-bottom:8px;">${alertText}</div>`;
+                });
+                if (criticalAlerts.length > 3) {
+                    alertsHTML += `<div class="alert normal" style="margin-top:4px;">+ ${criticalAlerts.length - 3} more alerts needing attention.</div>`;
+                }
+            } else {
+                alertsHTML = '<div class="alert normal">All student cohorts tracking above baseline. No critical issues detected.</div>';
+            }
+
+            // Resolve all diagnostics
+            const allDiagnosticsArrays = await Promise.all(diagnosticsPromises);
+            let allDiagnostics = allDiagnosticsArrays.flat();
+            
+            // Sort by date descending
+            allDiagnostics.sort((a, b) => {
+                const getMs = (t) => t ? (typeof t.toMillis === 'function' ? t.toMillis() : new Date(t).getTime()) : 0;
+                return getMs(b.created_at) - getMs(a.created_at);
+            });
+            
+            // Generate Diagnostics Stream HTML
+            let diagnosticsStreamHTML = '';
+            if (allDiagnostics.length > 0) {
+                allDiagnostics.slice(0, 3).forEach(d => {
+                    let dateStr = 'Just now';
+                    if (d.created_at) {
+                        dateStr = typeof d.created_at.toDate === 'function' 
+                            ? d.created_at.toDate().toLocaleString() 
+                            : new Date(d.created_at).toLocaleString();
+                    }
+                    diagnosticsStreamHTML += `
+                        <div class="sensor-box" style="margin-bottom: 12px; padding: 12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px;">
+                            <h4 style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">${dateStr} &bull; ${d.studentName}</h4>
+                            <div class="sensor-value" style="font-size: 14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:6px;">
+                                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#60a5fa;"></span>
+                                <span style="color:#60a5fa;">${d.subject}</span> AI Diagnostic Generated
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                diagnosticsStreamHTML = `
+                    <div class="sensor-box" style="grid-column: span 3; text-align:center; padding: 20px; background:transparent; border:1px dashed rgba(255,255,255,0.1);">
+                        <span style="color:var(--text-muted);">No AI diagnostics run yet.</span>
+                    </div>
+                `;
+            }
+
+            // Render Final HTML
+            container.innerHTML = `
+                <style>
+                    @keyframes spin { 100% { transform: rotate(360deg); } }
+                </style>
+                <section class="card modules-card" style="grid-column: span 2;">
+                    <h3>Active Academic Modules</h3>
+                    <div class="module-list" style="display: flex; gap: 15px;">
+                        <div class="module-item active" style="flex: 1;">
+                            <span>Student Progress Analytics</span>
+                            <span class="tag">Active</span>
+                        </div>
+                        <div class="module-item active" style="flex: 1;">
+                            <span>NLP AI Query Assistant</span>
+                            <span class="tag">Active</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card metrics-card">
+                    <h3>Student Cohort Progress</h3>
+                    <div class="big-metric" style="color:${avgMarks >= 75 ? 'var(--accent-green)' : (avgMarks >= 50 ? '#fbbf24' : 'var(--accent-red)')}">
+                        <span id="progress-score">${avgMarks}</span>%
+                    </div>
+                    <div class="sub-metrics">
+                        <div>Avg Attendance: <span style="color:${avgAttendance >= 75 ? 'var(--accent-green)' : 'var(--accent-red)'}">${avgAttendance}%</span></div>
+                        <div>Total Students: <span>${studentsCount}</span></div>
+                    </div>
+                </section>
+
+                <section class="card alert-card">
+                    <h3>Teacher Alerts</h3>
+                    <div class="alert-feed">
+                        ${alertsHTML}
+                    </div>
+                </section>
+
+                <section class="card sensor-card" style="grid-column: span 2;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="margin:0;">Recent AI Diagnostics</h3>
+                        <span style="font-size:12px; color:var(--text-muted); background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:12px;">${allDiagnostics.length} Total Reports</span>
+                    </div>
+                    <div class="sensor-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+                        ${diagnosticsStreamHTML}
+                    </div>
+                </section>
+            `;
+
+        } catch (e) {
+            console.error("Error loading dynamic dashboard:", e);
+            container.innerHTML = `<div style="grid-column:span 2; padding:40px; text-align:center; color:var(--accent-red); background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:8px;">Failed to load dashboard data: ${e.message}</div>`;
+        }
+    }, 0);
 }
 
 function injectOEEUI(container) {
