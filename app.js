@@ -1,5 +1,7 @@
 import { db, auth, onAuthStateChanged, signOut, collection, addDoc, serverTimestamp, getDocs, doc, setDoc, getDoc, updateDoc, query, where, limit } from "./firebase-config.js";
 
+const AI_API_BASE_URL = "https://complications-radiation-russia-wilson.trycloudflare.com";
+
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -497,7 +499,7 @@ window.showStudentDetail = async function(docId) {
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">
                             <label style="padding: 6px 12px; border-radius: 8px; background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#10b981'; this.style.color='white';" onmouseout="this.style.background='rgba(16,185,129,0.2)'; this.style.color='#34d399';">
                                 Upload PDF
-                                <input type="file" accept=".pdf" style="display: none;" onchange="alert('PDF uploaded for ' + '${subjStr}')">
+                                <input type="file" accept=".pdf" style="display: none;" onchange="window.runSubjectDiagnostic('${docId}', '${nameStr}', '${regStr}', '${subjStr}', '${s.marks}', '${s.attendance || '0'}', event.target.files[0])">
                             </label>
                         </td>
                     </tr>
@@ -791,4 +793,97 @@ window.runSubjectAnalysis = async function() {
         loading.style.display = 'none';
         results.style.display = 'block';
     }, 2500);
+};
+
+// Simple Markdown Parser for AI Text
+function parseMarkdown(md) {
+    if (!md) return '';
+    let html = md;
+    
+    // Headers (# to ####)
+    html = html.replace(/^#### (.*$)/gim, '<h4 style="color: #f8fafc; font-weight: 600; margin-top: 12px; margin-bottom: 8px;">$1</h4>');
+    html = html.replace(/^### (.*$)/gim, '<h3 style="color: #f8fafc; font-weight: 600; margin-top: 14px; margin-bottom: 8px;">$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2 style="color: #f8fafc; font-weight: 700; margin-top: 16px; margin-bottom: 10px;">$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1 style="color: #f8fafc; font-weight: 700; margin-top: 20px; margin-bottom: 12px; font-size: 20px;">$1</h1>');
+    
+    // Bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Bullet points
+    html = html.replace(/^[-*]\s+(.*$)/gim, '<p style="margin-bottom: 6px; color: #94a3b8; display: flex;"><span style="margin-right:8px;">•</span><span>$1</span></p>');
+
+    // Line breaks for remaining text
+    html = html.replace(/\n(?!<)/g, '<br/>\n');
+
+    return html;
+}
+
+// AI Diagnostic API Integration
+window.runSubjectDiagnostic = async function(studentDocId, studentName, regNo, subject, marks, attendance, pdfFile) {
+    if (!pdfFile) return;
+
+    // Open modal to show loading
+    const modal = document.getElementById('analysis-modal');
+    if (modal) {
+        document.getElementById('analysis-subtitle').innerText = `Diagnosing ${subject} for ${studentName} (${regNo})`;
+        document.getElementById('analysis-score-badge').innerText = `Score: ${marks}/100`;
+        document.getElementById('analysis-attend-badge').innerText = `Attendance: ${attendance}%`;
+        
+        document.getElementById('upload-label').innerText = pdfFile.name;
+        document.getElementById('analysis-loading').style.display = 'block';
+        document.getElementById('analysis-results').style.display = 'none';
+        document.getElementById('run-analysis-btn').style.display = 'none';
+        
+        modal.style.display = 'flex';
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append("student_id", regNo);
+        formData.append("student_name", studentName);
+        formData.append("subject", subject);
+        formData.append("marks", marks);
+        formData.append("attendance", attendance);
+        formData.append("answer_script", pdfFile);
+
+        const response = await fetch(`${AI_API_BASE_URL}/api/analyze-script`, {
+            method: "POST",
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API returned status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.analysis) {
+            // Save AI text to Firestore
+            await addDoc(collection(db, "students", studentDocId, "diagnostics"), {
+                subject: subject,
+                marks: marks,
+                attendance: attendance,
+                analysis_report: data.analysis,
+                created_at: serverTimestamp()
+            });
+
+            // Display results in Modal
+            if (modal) {
+                const resultsContainer = document.getElementById('analysis-results');
+                resultsContainer.innerHTML = parseMarkdown(data.analysis);
+                
+                document.getElementById('analysis-loading').style.display = 'none';
+                resultsContainer.style.display = 'block';
+            }
+        }
+
+    } catch (e) {
+        console.error("Error running diagnostic:", e);
+        if (modal) {
+            const resultsContainer = document.getElementById('analysis-results');
+            resultsContainer.innerHTML = `<p style="color: #ef4444; margin-bottom: 12px;">Error running diagnostic analysis.</p><p style="color: #94a3b8; font-size: 13px;">${e.message}</p>`;
+            document.getElementById('analysis-loading').style.display = 'none';
+            resultsContainer.style.display = 'block';
+        }
+    }
 };
