@@ -847,6 +847,7 @@ window.runSubjectAnalysis = async function() {
                 marks: modal.dataset.marks,
                 attendance: modal.dataset.attendance,
                 analysis_report: data.analysis,
+                uid: currentUser.uid,
                 created_at: serverTimestamp()
             });
 
