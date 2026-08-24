@@ -554,7 +554,8 @@ window.showStudentDetail = async function(docId) {
             if (!histContainer) return;
 
             try {
-                const diagSnap = await getDocs(collection(db, "students", docId, "diagnostics"));
+                const diagQuery = query(collection(db, "students", docId, "diagnostics"), where("uid", "==", currentUser.uid));
+                const diagSnap = await getDocs(diagQuery);
                 let historyHTML = '';
                 
                 if (!diagSnap.empty) {
