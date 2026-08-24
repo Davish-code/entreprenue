@@ -562,13 +562,17 @@ window.showStudentDetail = async function(docId) {
                     diagSnap.forEach(d => docs.push(d.data()));
                     // Sort descending by date
                     docs.sort((a, b) => {
-                        const tA = a.created_at ? a.created_at.toMillis() : 0;
-                        const tB = b.created_at ? b.created_at.toMillis() : 0;
-                        return tB - tA;
+                        const getMs = (t) => t ? (typeof t.toMillis === 'function' ? t.toMillis() : new Date(t).getTime()) : 0;
+                        return getMs(b.created_at) - getMs(a.created_at);
                     });
                     
                     docs.forEach(d => {
-                        const dateStr = d.created_at ? d.created_at.toDate().toLocaleString() : 'Just now';
+                        let dateStr = 'Just now';
+                        if (d.created_at) {
+                            dateStr = typeof d.created_at.toDate === 'function' 
+                                ? d.created_at.toDate().toLocaleString() 
+                                : new Date(d.created_at).toLocaleString();
+                        }
                         historyHTML += `
                             <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; padding:16px; margin-bottom:12px;">
                                 <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
@@ -587,7 +591,7 @@ window.showStudentDetail = async function(docId) {
                 histContainer.innerHTML = historyHTML;
             } catch (err) {
                 console.error("Failed to load history:", err);
-                histContainer.innerHTML = '<p style="color:#ef4444; font-size:14px; text-align:center; padding:20px;">Failed to load diagnostic history.</p>';
+                histContainer.innerHTML = \`<p style="color:#ef4444; font-size:14px; text-align:center; padding:20px;">Failed to load diagnostic history: \${err.message}</p>\`;
             }
         }, 0);
     } catch (e) {
