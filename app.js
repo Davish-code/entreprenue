@@ -67,11 +67,15 @@ async function initDashboard() {
 
         injectAcademicUI(content);
 
-        if (navHome && navStudents) {
+        const navAnalytics = document.getElementById('nav-analytics');
+        if (navAnalytics) navAnalytics.style.display = 'block';
+
+        if (navHome && navStudents && navAnalytics) {
             navHome.addEventListener('click', (e) => {
                 e.preventDefault();
                 navHome.classList.add('active');
                 navStudents.classList.remove('active');
+                navAnalytics.classList.remove('active');
                 breadcrumb.innerText = 'Academic Portal > Overview';
                 injectAcademicUI(content);
             });
@@ -80,8 +84,18 @@ async function initDashboard() {
                 e.preventDefault();
                 navStudents.classList.add('active');
                 navHome.classList.remove('active');
+                navAnalytics.classList.remove('active');
                 breadcrumb.innerText = 'Academic Portal > Student Details';
                 injectStudentDetailsUI(content);
+            });
+            
+            navAnalytics.addEventListener('click', (e) => {
+                e.preventDefault();
+                navAnalytics.classList.add('active');
+                navHome.classList.remove('active');
+                navStudents.classList.remove('active');
+                breadcrumb.innerText = 'Academic Portal > Analytics';
+                injectAnalyticsUI(content);
             });
         }
 
@@ -321,7 +335,7 @@ function injectOEEUI(container) {
             <div class="sensor-grid">
                 <div class="sensor-box">
                     <h4>Spindle Temp</h4>
-                    <div class="sensor-value"><span>62.4</span>°C</div>
+                    <div class="sensor-value"><span>62.4</span>Â°C</div>
                 </div>
                 <div class="sensor-box">
                     <h4>Vibration</h4>
@@ -476,7 +490,7 @@ window.addSubjectRow = function() {
         <input type="text" placeholder="Subject" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
         <input type="text" placeholder="Marks" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
         <input type="text" placeholder="Attend %" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
-        <button type="button" onclick="window.removeSubjectRow('subject-row-${subjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+        <button type="button" onclick="window.removeSubjectRow('subject-row-${subjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">Ã—</button>
     `;
     container.appendChild(row);
 };
@@ -571,7 +585,7 @@ window.loadStudentsList = async function() {
                     <div style="font-weight:600; font-size:15px;">${data.name || 'Unknown'}</div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">${data.branch || '-'} &bull; Reg: ${data.regNo || docSnap.id}</div>
                 </div>
-                <span style="color:var(--text-muted); font-size:20px;">›</span>
+                <span style="color:var(--text-muted); font-size:20px;">â€º</span>
             `;
             listContainer.appendChild(card);
         });
@@ -611,7 +625,7 @@ window.showStudentDetail = async function(docId) {
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">${s.attendance || '0'}%</td>
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">
                             <button onclick="window.openAnalysisModal('${subjStr}', '${s.marks}', '${s.attendance || '0'}%', '${nameStr}', '${regStr}', '${docId}')" style="padding: 6px 12px; border-radius: 8px; background: rgba(37,99,235,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#2563eb'; this.style.color='white';" onmouseout="this.style.background='rgba(37,99,235,0.2)'; this.style.color='#60a5fa';">
-                                Analyze ↗
+                                Analyze â†—
                             </button>
                         </td>
                     </tr>
@@ -623,7 +637,7 @@ window.showStudentDetail = async function(docId) {
 
         content.innerHTML = `
             <div style="grid-column: span 2;">
-                <button onclick="window.injectStudentDetailsUI(document.getElementById('dashboard-content'))" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">← Back to Student List</button>
+                <button onclick="window.injectStudentDetailsUI(document.getElementById('dashboard-content'))" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">â† Back to Student List</button>
             </div>
 
             <section class="card" style="grid-column: span 2;">
@@ -696,7 +710,7 @@ window.showStudentDetail = async function(docId) {
                             <details style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; margin-bottom:12px;">
                                 <summary style="padding:16px; outline:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
                                     <span style="color:#60a5fa; font-weight:600; font-size:14px; display:flex; align-items:center;">
-                                        <span style="margin-right:8px; font-size:10px;">▶</span>
+                                        <span style="margin-right:8px; font-size:10px;">â–¶</span>
                                         ${d.subject} &bull; ${d.exam_type || 'CAT-1'} 
                                         <span style="color: #94a3b8; font-weight: normal; margin-left: 8px;">(Score: ${d.marks}, Attend: ${d.attendance})</span>
                                     </span>
@@ -803,7 +817,7 @@ window.editStudentUI = async function(docId) {
                         <input type="text" placeholder="Subject" value="${s.subject || ''}" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
                         <input type="text" placeholder="Marks" value="${s.marks || ''}" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
                         <input type="text" placeholder="Attend %" value="${s.attendance || ''}" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
-                        <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-${window.editSubjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+                        <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-${window.editSubjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">Ã—</button>
                     </div>
                 `;
             });
@@ -814,14 +828,14 @@ window.editStudentUI = async function(docId) {
                     <input type="text" placeholder="Subject" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
                     <input type="text" placeholder="Marks" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
                     <input type="text" placeholder="Attend %" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
-                    <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-1')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+                    <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-1')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">Ã—</button>
                 </div>
             `;
         }
 
         content.innerHTML = `
             <div style="grid-column: span 2;">
-                <button onclick="window.showStudentDetail('${docId}')" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">← Cancel Edit</button>
+                <button onclick="window.showStudentDetail('${docId}')" style="background:none; border:1px solid var(--border-color); color:var(--accent-blue); padding:8px 16px; border-radius:6px; cursor:pointer; font-size:14px; margin-bottom:20px;">â† Cancel Edit</button>
             </div>
             
             <section class="card" style="grid-column: span 2;">
@@ -874,7 +888,7 @@ window.addEditSubjectRow = function() {
         <input type="text" placeholder="Subject" required style="flex:2; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
         <input type="text" placeholder="Marks" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
         <input type="text" placeholder="Attend %" required style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:white; border-radius:4px;">
-        <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-${window.editSubjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">×</button>
+        <button type="button" onclick="window.removeEditSubjectRow('edit-subject-row-${window.editSubjectCounter}')" style="width:36px; height:36px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4); border-radius:4px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">Ã—</button>
     `;
     container.appendChild(row);
 };
@@ -1057,10 +1071,240 @@ function parseMarkdown(md) {
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
     // Bullet points
-    html = html.replace(/^[-*]\s+(.*$)/gim, '<p style="margin-bottom: 6px; color: #94a3b8; display: flex;"><span style="margin-right:8px;">•</span><span>$1</span></p>');
+    html = html.replace(/^[-*]\s+(.*$)/gim, '<p style="margin-bottom: 6px; color: #94a3b8; display: flex;"><span style="margin-right:8px;">â€¢</span><span>$1</span></p>');
 
     // Line breaks for remaining text
     html = html.replace(/\n(?!<)/g, '<br/>\n');
 
     return html;
 }
+
+window.injectAnalyticsUI = function(container) {
+    if (!container) return;
+    container.innerHTML = `
+        <div style="grid-column: span 2; display:flex; flex-direction:column; justify-content:center; align-items:center; height: 300px; gap:20px;">
+            <div style="color:var(--text-muted); font-size:15px; display:flex; align-items:center; gap:10px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                Aggregating AI Diagnostics...
+            </div>
+        </div>
+    `;
+
+    setTimeout(async () => {
+        try {
+            await window.loadAnalyticsData(container);
+        } catch (e) {
+            console.error("Error loading analytics:", e);
+            container.innerHTML = `<div style="grid-column:span 2; padding:40px; text-align:center; color:var(--accent-red); background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:8px;">Failed to load analytics: ${e.message}</div>`;
+        }
+    }, 0);
+};
+
+window.loadAnalyticsData = async function(container) {
+    // 1. Fetch Students & Diagnostics
+    const studentsQuery = query(collection(db, "eduflow"), where("uid", "==", currentUser.uid));
+    const studentsSnap = await getDocs(studentsQuery);
+    
+    const diagnosticsPromises = [];
+    studentsSnap.forEach(docSnap => {
+        const studentData = docSnap.data();
+        const diagQuery = query(collection(db, "students", docSnap.id, "diagnostics"), where("uid", "==", currentUser.uid));
+        
+        diagnosticsPromises.push(getDocs(diagQuery).then(snap => {
+            const docs = [];
+            snap.forEach(d => {
+                const diag = d.data();
+                diag.studentName = studentData.name || "Unknown";
+                diag.studentId = docSnap.id;
+                docs.push(diag);
+            });
+            return docs;
+        }));
+    });
+    
+    const allDiagsArrays = await Promise.all(diagnosticsPromises);
+    const allDiags = allDiagsArrays.flat();
+    
+    // Check if empty
+    if (allDiags.length === 0) {
+        container.innerHTML = '<div style="grid-column:span 2; padding:40px; text-align:center; color:var(--text-muted);">No diagnostic data available to analyze.</div>';
+        return;
+    }
+    
+    // Group Data for Module 1
+    const subjectStats = {};
+    const scatterData = [];
+    const highRiskStudents = [];
+    
+    allDiags.forEach(diag => {
+        const subject = diag.subject || 'Unknown';
+        const marks = parseFloat(diag.marks) || 0;
+        const attend = parseFloat(diag.attendance) || 0;
+        
+        if (!subjectStats[subject]) subjectStats[subject] = { totalMarks: 0, count: 0 };
+        subjectStats[subject].totalMarks += marks;
+        subjectStats[subject].count++;
+        
+        // Scatter plot dataset
+        scatterData.push({ x: attend, y: marks, r: 5 });
+        
+        if (marks < 50 || attend < 75) {
+            highRiskStudents.push({
+                name: diag.studentName,
+                id: diag.studentId,
+                subject: subject,
+                marks: marks,
+                attendance: attend
+            });
+        }
+    });
+    
+    const barLabels = Object.keys(subjectStats);
+    const barData = barLabels.map(s => (subjectStats[s].totalMarks / subjectStats[s].count).toFixed(1));
+    
+    // Generate High-Risk Table HTML
+    let tableRows = '';
+    if (highRiskStudents.length > 0) {
+        highRiskStudents.forEach(hr => {
+            tableRows += `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.05); color:var(--text-muted); font-size:13px;">
+                    <td style="padding:12px;">${hr.name}</td>
+                    <td style="padding:12px;">${hr.subject}</td>
+                    <td style="padding:12px; color:${hr.marks < 50 ? 'var(--accent-red)' : 'var(--text-main)'}">${hr.marks}</td>
+                    <td style="padding:12px; color:${hr.attendance < 75 ? 'var(--accent-red)' : 'var(--text-main)'}">${hr.attendance}%</td>
+                    <td style="padding:12px;">
+                        <button onclick="window.showStudentDetail('${hr.id}')" style="background:rgba(255,255,255,0.05); color:var(--accent-blue); border:1px solid rgba(255,255,255,0.1); padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px;">View Record ↗</button>
+                    </td>
+                </tr>
+            `;
+        });
+    } else {
+        tableRows = '<tr><td colspan="5" style="padding:20px; text-align:center; color:var(--text-muted);">No high-risk students found!</td></tr>';
+    }
+    
+    // Inject Layout
+    container.innerHTML = `
+        <style>
+            @keyframes spin { 100% { transform: rotate(360deg); } }
+            .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width:100%; grid-column: span 2; }
+            @media (max-width: 900px) { .analytics-grid { grid-template-columns: 1fr; } }
+        </style>
+        
+        <div class="analytics-grid">
+            <section class="card" style="min-height: 350px;">
+                <h3 style="margin-bottom:15px; font-size:15px;">Subject-Wise Knowledge Gap</h3>
+                <div style="position:relative; height: 280px; width: 100%;">
+                    <canvas id="gap-bar-chart"></canvas>
+                </div>
+            </section>
+            
+            <section class="card" style="min-height: 350px;">
+                <h3 style="margin-bottom:15px; font-size:15px;">Attendance vs. Score Correlation</h3>
+                <div style="position:relative; height: 280px; width: 100%;">
+                    <canvas id="corr-scatter-chart"></canvas>
+                </div>
+            </section>
+        </div>
+        
+        <section class="card" style="grid-column: span 2;">
+            <h3 style="margin-bottom:15px; font-size:15px; color:var(--accent-red);">High-Risk Interventions Queue</h3>
+            <table style="width:100%; border-collapse:collapse; text-align:left;">
+                <thead>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text-muted); font-size:12px;">
+                        <th style="padding:10px 12px; font-weight:600;">Student Name</th>
+                        <th style="padding:10px 12px; font-weight:600;">Subject</th>
+                        <th style="padding:10px 12px; font-weight:600;">Score</th>
+                        <th style="padding:10px 12px; font-weight:600;">Attendance</th>
+                        <th style="padding:10px 12px; font-weight:600;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </section>
+    `;
+    
+    // Render Charts
+    const ctxBar = document.getElementById('gap-bar-chart');
+    if (ctxBar) {
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: barLabels,
+                datasets: [{
+                    label: 'Avg Score',
+                    data: barData,
+                    backgroundColor: 'rgba(96, 165, 250, 0.7)',
+                    borderColor: 'rgba(96, 165, 250, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    }
+    
+    const ctxScatter = document.getElementById('corr-scatter-chart');
+    if (ctxScatter) {
+        new Chart(ctxScatter, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Students',
+                    data: scatterData,
+                    backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                    borderColor: 'rgba(239, 68, 68, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Marks: ${context.raw.y}, Attendance: ${context.raw.x}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Marks', color: '#94a3b8' },
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Attendance %', color: '#94a3b8' },
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    }
+};
