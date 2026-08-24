@@ -494,11 +494,17 @@ window.showStudentDetail = async function(docId) {
                                 Analyze ↗
                             </button>
                         </td>
+                        <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">
+                            <label style="padding: 6px 12px; border-radius: 8px; background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#10b981'; this.style.color='white';" onmouseout="this.style.background='rgba(16,185,129,0.2)'; this.style.color='#34d399';">
+                                Upload PDF
+                                <input type="file" accept=".pdf" style="display: none;" onchange="alert('PDF uploaded for ' + '${subjStr}')">
+                            </label>
+                        </td>
                     </tr>
                 `;
             });
         } else {
-            subjectRows = '<tr><td colspan="5" style="text-align:center; padding:15px; color:var(--text-muted);">No subjects recorded.</td></tr>';
+            subjectRows = '<tr><td colspan="6" style="text-align:center; padding:15px; color:var(--text-muted);">No subjects recorded.</td></tr>';
         }
 
         content.innerHTML = `
@@ -529,6 +535,7 @@ window.showStudentDetail = async function(docId) {
                             <th style="padding:10px 12px;">Marks</th>
                             <th style="padding:10px 12px;">Attendance</th>
                             <th style="padding:10px 12px;">Action</th>
+                            <th style="padding:10px 12px;">Notes PDF</th>
                         </tr>
                     </thead>
                     <tbody>
