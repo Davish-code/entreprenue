@@ -625,7 +625,7 @@ window.showStudentDetail = async function(docId) {
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">${s.attendance || '0'}%</td>
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">
                             <button onclick="window.openAnalysisModal('${subjStr}', '${s.marks}', '${s.attendance || '0'}%', '${nameStr}', '${regStr}', '${docId}')" style="padding: 6px 12px; border-radius: 8px; background: rgba(37,99,235,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#2563eb'; this.style.color='white';" onmouseout="this.style.background='rgba(37,99,235,0.2)'; this.style.color='#60a5fa';">
-                                Analyze â†—
+                                Analyze ↗
                             </button>
                         </td>
                     </tr>
@@ -1071,7 +1071,7 @@ function parseMarkdown(md) {
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
     // Bullet points
-    html = html.replace(/^[-*]\s+(.*$)/gim, '<p style="margin-bottom: 6px; color: #94a3b8; display: flex;"><span style="margin-right:8px;">â€¢</span><span>$1</span></p>');
+    html = html.replace(/^[-*]\s+(.*$)/gim, '<p style="margin-bottom: 6px; color: #94a3b8; display: flex;"><span style="margin-right:8px;">•</span><span>$1</span></p>');
 
     // Line breaks for remaining text
     html = html.replace(/\n(?!<)/g, '<br/>\n');
