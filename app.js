@@ -580,7 +580,7 @@ window.showStudentDetail = async function(docId) {
                                     <span style="color:#60a5fa; font-weight:600; font-size:14px; display:flex; align-items:center;">
                                         <span style="margin-right:8px; font-size:10px;">▶</span>
                                         ${d.subject} &bull; ${d.exam_type || 'CAT-1'} 
-                                        <span style="color: #94a3b8; font-weight: normal; margin-left: 8px;">(Score: ${d.marks}, Attend: ${d.attendance}%)</span>
+                                        <span style="color: #94a3b8; font-weight: normal; margin-left: 8px;">(Score: ${d.marks}, Attend: ${d.attendance})</span>
                                     </span>
                                     <span style="color:var(--text-muted); font-size:12px;">${dateStr}</span>
                                 </summary>
