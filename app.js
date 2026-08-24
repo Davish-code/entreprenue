@@ -820,8 +820,9 @@ window.runSubjectAnalysis = async function() {
         formData.append("student_id", modal.dataset.regNo);
         formData.append("student_name", modal.dataset.name);
         formData.append("subject", modal.dataset.subject);
-        formData.append("marks", modal.dataset.marks);
-        formData.append("attendance", modal.dataset.attendance);
+        // Ensure marks and attendance are sent as numbers (or at least clean strings without %) to prevent 422 Validation Error
+        formData.append("marks", parseInt(modal.dataset.marks, 10) || 0);
+        formData.append("attendance", parseInt(modal.dataset.attendance.replace('%', ''), 10) || 0);
         formData.append("answer_script", scriptFile);
         
         if (notesFile) {
