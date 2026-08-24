@@ -591,7 +591,7 @@ window.showStudentDetail = async function(docId) {
                 histContainer.innerHTML = historyHTML;
             } catch (err) {
                 console.error("Failed to load history:", err);
-                histContainer.innerHTML = \`<p style="color:#ef4444; font-size:14px; text-align:center; padding:20px;">Failed to load diagnostic history: \${err.message}</p>\`;
+                histContainer.innerHTML = `<p style="color:#ef4444; font-size:14px; text-align:center; padding:20px;">Failed to load diagnostic history: ${err.message}</p>`;
             }
         }, 0);
     } catch (e) {
