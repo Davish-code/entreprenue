@@ -575,15 +575,19 @@ window.showStudentDetail = async function(docId) {
                                 : new Date(d.created_at).toLocaleString();
                         }
                         historyHTML += `
-                            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; padding:16px; margin-bottom:12px;">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
-                                    <span style="color:#60a5fa; font-weight:600; font-size:14px;">${d.subject} <span style="color: #94a3b8; font-weight: normal; margin-left: 8px;">(Score: ${d.marks}, Attend: ${d.attendance}%)</span></span>
+                            <details style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:8px; margin-bottom:12px;">
+                                <summary style="padding:16px; outline:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:#60a5fa; font-weight:600; font-size:14px; display:flex; align-items:center;">
+                                        <span style="margin-right:8px; font-size:10px;">▶</span>
+                                        ${d.subject} &bull; ${d.exam_type || 'CAT-1'} 
+                                        <span style="color: #94a3b8; font-weight: normal; margin-left: 8px;">(Score: ${d.marks}, Attend: ${d.attendance}%)</span>
+                                    </span>
                                     <span style="color:var(--text-muted); font-size:12px;">${dateStr}</span>
-                                </div>
-                                <div style="color:#cbd5e1; font-size:14px; line-height:1.6; overflow-x: auto;">
+                                </summary>
+                                <div style="padding: 0 16px 16px 16px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:16px; margin-top:4px; color:#cbd5e1; font-size:14px; line-height:1.6; overflow-x: auto;">
                                     ${parseMarkdown(d.analysis_report)}
                                 </div>
-                            </div>
+                            </details>
                         `;
                     });
                 } else {
