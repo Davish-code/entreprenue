@@ -154,7 +154,7 @@ function injectAcademicUI(container) {
                 }
                 
                 // Queue diagnostic fetch
-                const diagQuery = query(collection(db, "students", docSnap.id, "diagnostics"));
+                const diagQuery = query(collection(db, "students", docSnap.id, "diagnostics"), where("uid", "==", currentUser.uid));
                 diagnosticsPromises.push(getDocs(diagQuery).then(snap => {
                     const docs = [];
                     snap.forEach(d => {
