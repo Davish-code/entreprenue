@@ -492,21 +492,15 @@ window.showStudentDetail = async function(docId) {
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">${s.marks}</td>
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">${s.attendance || '0'}%</td>
                         <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">
-                            <button onclick="window.openAnalysisModal('${subjStr}', '${s.marks}', '${s.attendance || '0'}%', '${nameStr}', '${regStr}')" style="padding: 6px 12px; border-radius: 8px; background: rgba(37,99,235,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#2563eb'; this.style.color='white';" onmouseout="this.style.background='rgba(37,99,235,0.2)'; this.style.color='#60a5fa';">
+                            <button onclick="window.openAnalysisModal('${subjStr}', '${s.marks}', '${s.attendance || '0'}%', '${nameStr}', '${regStr}', '${docId}')" style="padding: 6px 12px; border-radius: 8px; background: rgba(37,99,235,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#2563eb'; this.style.color='white';" onmouseout="this.style.background='rgba(37,99,235,0.2)'; this.style.color='#60a5fa';">
                                 Analyze ↗
                             </button>
-                        </td>
-                        <td style="padding:10px 12px; border-bottom:1px solid var(--border-color);">
-                            <label style="padding: 6px 12px; border-radius: 8px; background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#10b981'; this.style.color='white';" onmouseout="this.style.background='rgba(16,185,129,0.2)'; this.style.color='#34d399';">
-                                Upload PDF
-                                <input type="file" accept=".pdf" style="display: none;" onchange="window.runSubjectDiagnostic('${docId}', '${nameStr}', '${regStr}', '${subjStr}', '${s.marks}', '${s.attendance || '0'}', event.target.files[0])">
-                            </label>
                         </td>
                     </tr>
                 `;
             });
         } else {
-            subjectRows = '<tr><td colspan="6" style="text-align:center; padding:15px; color:var(--text-muted);">No subjects recorded.</td></tr>';
+            subjectRows = '<tr><td colspan="5" style="text-align:center; padding:15px; color:var(--text-muted);">No subjects recorded.</td></tr>';
         }
 
         content.innerHTML = `
@@ -537,7 +531,7 @@ window.showStudentDetail = async function(docId) {
                             <th style="padding:10px 12px;">Marks</th>
                             <th style="padding:10px 12px;">Attendance</th>
                             <th style="padding:10px 12px;">Action</th>
-                            <th style="padding:10px 12px;">Notes PDF</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -749,20 +743,32 @@ window.submitEditStudentForm = async function(event, docId) {
 };
 
 // --- AI GAP ANALYSIS MODAL LOGIC ---
-window.openAnalysisModal = function(subject, marks, attendance, name, regNo) {
+window.openAnalysisModal = function(subject, marks, attendance, name, regNo, docId) {
     const modal = document.getElementById('analysis-modal');
     if (!modal) return;
+    
+    // Store data for submission
+    modal.dataset.studentDocId = docId;
+    modal.dataset.subject = subject;
+    modal.dataset.marks = marks;
+    modal.dataset.attendance = attendance;
+    modal.dataset.name = name;
+    modal.dataset.regNo = regNo;
     
     document.getElementById('analysis-subtitle').innerText = `Diagnosing ${subject} for ${name} (${regNo})`;
     document.getElementById('analysis-score-badge').innerText = `Score: ${marks}/100`;
     document.getElementById('analysis-attend-badge').innerText = `Attendance: ${attendance}`;
     
     // Reset state
-    document.getElementById('upload-label').innerText = 'Upload Student CAT-1 Answer Sheet (PDF)';
+    document.getElementById('notes-upload-label').innerText = 'Upload Professor Notes / Syllabus (Optional PDF)';
+    document.getElementById('script-upload-label').innerText = 'Upload Student CAT-1 Answer Sheet (Mandatory PDF)';
     document.getElementById('analysis-loading').style.display = 'none';
+    document.getElementById('analysis-loading').querySelector('p').innerText = 'Analyzing student answer script against syllabus...';
     document.getElementById('analysis-results').style.display = 'none';
     document.getElementById('run-analysis-btn').style.display = 'block';
-    document.getElementById('file-upload').value = '';
+    
+    document.getElementById('professor-notes-upload').value = '';
+    document.getElementById('answer-script-upload').value = '';
     
     modal.style.display = 'flex';
 };
@@ -772,14 +778,35 @@ window.closeAnalysisModal = function() {
     if (modal) modal.style.display = 'none';
 };
 
-window.handleFileUpload = function(event) {
+window.handleNotesUpload = function(event) {
     const file = event.target.files[0];
     if (file) {
-        document.getElementById('upload-label').innerText = file.name;
+        document.getElementById('notes-upload-label').innerText = file.name;
+    }
+};
+
+window.handleScriptUpload = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        document.getElementById('script-upload-label').innerText = file.name;
     }
 };
 
 window.runSubjectAnalysis = async function() {
+    const modal = document.getElementById('analysis-modal');
+    if (!modal) return;
+
+    const answerScriptInput = document.getElementById('answer-script-upload');
+    const professorNotesInput = document.getElementById('professor-notes-upload');
+    
+    const scriptFile = answerScriptInput.files[0];
+    const notesFile = professorNotesInput.files[0];
+
+    if (!scriptFile) {
+        alert("Please upload the Mandatory Student CAT-1 Answer Sheet (PDF) before running analysis.");
+        return;
+    }
+
     const runBtn = document.getElementById('run-analysis-btn');
     const loading = document.getElementById('analysis-loading');
     const results = document.getElementById('analysis-results');
@@ -787,12 +814,53 @@ window.runSubjectAnalysis = async function() {
     runBtn.style.display = 'none';
     loading.style.display = 'block';
     results.style.display = 'none';
-    
-    // Simulate AI processing delay
-    setTimeout(() => {
+
+    try {
+        const formData = new FormData();
+        formData.append("student_id", modal.dataset.regNo);
+        formData.append("student_name", modal.dataset.name);
+        formData.append("subject", modal.dataset.subject);
+        formData.append("marks", modal.dataset.marks);
+        formData.append("attendance", modal.dataset.attendance);
+        formData.append("answer_script", scriptFile);
+        
+        if (notesFile) {
+            formData.append("professor_notes", notesFile);
+        }
+
+        const response = await fetch(`${AI_API_BASE_URL}/api/analyze-script`, {
+            method: "POST",
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API returned status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.analysis) {
+            // Save AI text to Firestore
+            await addDoc(collection(db, "students", modal.dataset.studentDocId, "diagnostics"), {
+                subject: modal.dataset.subject,
+                marks: modal.dataset.marks,
+                attendance: modal.dataset.attendance,
+                analysis_report: data.analysis,
+                created_at: serverTimestamp()
+            });
+
+            // Display results in Modal
+            results.innerHTML = parseMarkdown(data.analysis);
+            loading.style.display = 'none';
+            results.style.display = 'block';
+        }
+
+    } catch (e) {
+        console.error("Error running diagnostic:", e);
+        results.innerHTML = `<p style="color: #ef4444; margin-bottom: 12px;">Error running diagnostic analysis.</p><p style="color: #94a3b8; font-size: 13px;">${e.message}</p>`;
         loading.style.display = 'none';
         results.style.display = 'block';
-    }, 2500);
+    }
 };
 
 // Simple Markdown Parser for AI Text
@@ -817,73 +885,3 @@ function parseMarkdown(md) {
 
     return html;
 }
-
-// AI Diagnostic API Integration
-window.runSubjectDiagnostic = async function(studentDocId, studentName, regNo, subject, marks, attendance, pdfFile) {
-    if (!pdfFile) return;
-
-    // Open modal to show loading
-    const modal = document.getElementById('analysis-modal');
-    if (modal) {
-        document.getElementById('analysis-subtitle').innerText = `Diagnosing ${subject} for ${studentName} (${regNo})`;
-        document.getElementById('analysis-score-badge').innerText = `Score: ${marks}/100`;
-        document.getElementById('analysis-attend-badge').innerText = `Attendance: ${attendance}%`;
-        
-        document.getElementById('upload-label').innerText = pdfFile.name;
-        document.getElementById('analysis-loading').style.display = 'block';
-        document.getElementById('analysis-results').style.display = 'none';
-        document.getElementById('run-analysis-btn').style.display = 'none';
-        
-        modal.style.display = 'flex';
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append("student_id", regNo);
-        formData.append("student_name", studentName);
-        formData.append("subject", subject);
-        formData.append("marks", marks);
-        formData.append("attendance", attendance);
-        formData.append("answer_script", pdfFile);
-
-        const response = await fetch(`${AI_API_BASE_URL}/api/analyze-script`, {
-            method: "POST",
-            body: formData
-        });
-        
-        if (!response.ok) {
-            throw new Error(`API returned status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (data.analysis) {
-            // Save AI text to Firestore
-            await addDoc(collection(db, "students", studentDocId, "diagnostics"), {
-                subject: subject,
-                marks: marks,
-                attendance: attendance,
-                analysis_report: data.analysis,
-                created_at: serverTimestamp()
-            });
-
-            // Display results in Modal
-            if (modal) {
-                const resultsContainer = document.getElementById('analysis-results');
-                resultsContainer.innerHTML = parseMarkdown(data.analysis);
-                
-                document.getElementById('analysis-loading').style.display = 'none';
-                resultsContainer.style.display = 'block';
-            }
-        }
-
-    } catch (e) {
-        console.error("Error running diagnostic:", e);
-        if (modal) {
-            const resultsContainer = document.getElementById('analysis-results');
-            resultsContainer.innerHTML = `<p style="color: #ef4444; margin-bottom: 12px;">Error running diagnostic analysis.</p><p style="color: #94a3b8; font-size: 13px;">${e.message}</p>`;
-            document.getElementById('analysis-loading').style.display = 'none';
-            resultsContainer.style.display = 'block';
-        }
-    }
-};
