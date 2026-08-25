@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Enterprise | Select Model</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #c5c6c7;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .model-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .model-container h1 {
+            font-size: 2.5rem;
+            color: #66fcf1;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .model-container p {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: #888;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .model-card {
+            background: rgba(31, 40, 51, 0.7);
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            border-radius: 12px;
+            padding: 30px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+            border-color: #66fcf1;
+            box-shadow: 0 10px 30px rgba(102, 252, 241, 0.2);
+        }
+
+        .model-card h3 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            text-transform: capitalize;
+        }
+
+        .model-card p {
+            font-size: 0.95rem;
+            color: #aaa;
+            margin-bottom: 0;
+        }
+
+        /* Subtle glow effects */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(102,252,241,0.1) 0%, rgba(11,12,16,0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow" style="top: -100px; left: -100px;"></div>
+    <div class="glow" style="bottom: -100px; right: -100px;"></div>
+
+    <div class="model-container">
+        <h1>Select Workspace</h1>
+        <p>You have access to multiple models. Please select one to continue.</p>
+        
+        <div class="model-grid" id="model-grid">
+            <!-- Models will be dynamically injected here -->
+        </div>
+    </div>
+
+    <script type="module" src="model_select.js"></script>
+</body>
+</html>

@@ -110,10 +110,16 @@ window.handleAuth = async function(event) {
         submitBtn.innerText = "Authenticating...";
         submitBtn.disabled = true;
 
-        // In a full implementation, you would use signInWithEmailAndPassword here
-        // For now we'll just alert and redirect as requested by the prototype
-        alert("Authentication successful. Securing connection to fleet telemetry...");
-        window.location.href = "dashboard.html"; 
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+            const user = userCredential.user;
+            await handleLoginSuccess(user);
+        } catch (error) {
+            console.error("Error logging in: ", error);
+            alert("Login failed: " + error.message);
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
     }
 }
 
@@ -196,9 +202,41 @@ function showSlides(n) {
 
 // --- FIREBASE BACKEND INTEGRATION ---
 
-import { db, auth, provider, collection, addDoc, serverTimestamp, createUserWithEmailAndPassword, signInWithPopup } from "./firebase-config.js";
+import { db, auth, provider, collection, addDoc, serverTimestamp, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, getDocs, query, where } from "./firebase-config.js";
 
 // Standard Form Submission logic moved to handleAuth
+
+async function handleLoginSuccess(user) {
+    try {
+        const q = query(collection(db, "enterprise_pilots"), where("uid", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        
+        let modules = new Set();
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.selectedModule) {
+                modules.add(data.selectedModule);
+            }
+        });
+        
+        const moduleArray = Array.from(modules);
+        
+        if (moduleArray.length === 1) {
+            localStorage.setItem("selectedModule", moduleArray[0]);
+            alert("Authentication successful. Securing connection to fleet telemetry...");
+            window.location.href = "dashboard.html";
+        } else if (moduleArray.length > 1) {
+            sessionStorage.setItem("availableModules", JSON.stringify(moduleArray));
+            window.location.href = "model_select.html";
+        } else {
+            alert("Authentication successful. Securing connection to fleet telemetry...");
+            window.location.href = "dashboard.html";
+        }
+    } catch (error) {
+        console.error("Error fetching modules:", error);
+        alert("Error: " + error.message);
+    }
+}
 
 // 5. Handle Google Workspace SSO (Signup)
 const googleSsoBtn = document.getElementById('google-sso-btn');
@@ -249,8 +287,7 @@ if (googleLoginSsoBtn) {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             
-            alert(`Logged in successfully as ${user.email}`);
-            window.location.href = "dashboard.html";
+            await handleLoginSuccess(user);
             
         } catch (error) {
             console.error("SSO Failed: ", error.message);
