@@ -44,7 +44,7 @@ async function initDashboard() {
         if (!querySnapshot.empty) {
             const data = querySnapshot.docs[0].data();
             company = data.companyName || company;
-            selectedModule = data.selectedModule || selectedModule;
+            selectedModule = localStorage.getItem('selectedModule') || data.selectedModule || selectedModule;
         } else {
             company = localStorage.getItem('companyName') || company;
             selectedModule = localStorage.getItem('selectedModule') || selectedModule;
