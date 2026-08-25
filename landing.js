@@ -12,9 +12,20 @@ window.toggleMenu = function() {
 }
 
 // Open the modal (specify 'login' or 'signup')
-window.openModal = function(type, module = null) {
+window.openModal = function(type, module = null, tier = 'business') {
+    const modalOverlay = document.getElementById('auth-modal');
     modalOverlay.classList.add('show');
     window.switchView(type);
+    
+    // Pre-select module if coming from a specific CTA
+    if (module) {
+        const select = document.getElementById('module-select');
+        if (select) {
+            select.value = module;
+        }
+        localStorage.setItem('selectedModule', module);
+        localStorage.setItem('selectedTier', tier);
+    }
     
     if (type === 'signup') {
         const title = document.getElementById('signup-title');
@@ -263,6 +274,7 @@ if (googleSsoBtn) {
                 companyName: companyName, 
                 workEmail: user.email,
                 selectedModule: selectedModule,
+                selectedTier: localStorage.getItem('selectedTier') || 'business',
                 authMethod: "Google SSO",
                 uid: user.uid,
                 status: "Pending Deployment",
@@ -339,7 +351,7 @@ function renderPricing(model) {
                 <ul class="pricing-features">
                     ${data.personal.features.map(f => `<li>${f}</li>`).join('')}
                 </ul>
-                <button class="pricing-btn" onclick="openModal('signup', '${model}')">Get Started</button>
+                <button class="pricing-btn" onclick="openModal('signup', '${model}', 'personal')">Get Started</button>
             </div>
             <div class="pricing-card featured">
                 <h3 class="pricing-tier">Business</h3>
@@ -348,7 +360,7 @@ function renderPricing(model) {
                 <ul class="pricing-features">
                     ${data.business.features.map(f => `<li>${f}</li>`).join('')}
                 </ul>
-                <button class="pricing-btn" onclick="openModal('signup', '${model}')">Start Free Trial</button>
+                <button class="pricing-btn" onclick="openModal('signup', '${model}', 'business')">Start Free Trial</button>
             </div>
             <div class="pricing-card">
                 <h3 class="pricing-tier">Enterprise</h3>
@@ -357,7 +369,7 @@ function renderPricing(model) {
                 <ul class="pricing-features">
                     ${data.enterprise.features.map(f => `<li>${f}</li>`).join('')}
                 </ul>
-                <button class="pricing-btn" onclick="openModal('signup', '${model}')">Contact Sales</button>
+                <button class="pricing-btn" onclick="openModal('signup', '${model}', 'enterprise')">Contact Sales</button>
             </div>
         `;
         grid.classList.remove('fade-out');

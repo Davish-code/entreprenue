@@ -56,7 +56,13 @@ async function initDashboard() {
     }
 
     // Set Header
-    if (clientName) clientName.innerText = company;
+    if (clientName) {
+        if (localStorage.getItem('isPremium') === 'true') {
+            clientName.innerHTML = `${company} <span class="tag" style="background: rgba(52, 211, 153, 0.2); color: var(--accent-green); margin-left: 10px; border-radius: 4px; padding: 2px 6px;">PRO</span>`;
+        } else {
+            clientName.innerText = company;
+        }
+    }
 
     // Inject UI based on module
     if (selectedModule === 'eduflow') {
@@ -307,7 +313,7 @@ function injectOEEUI(container) {
                 </div>
                 <div class="module-item inactive" style="flex: 1;">
                     <span>Predictive Maintenance</span>
-                    <button class="upgrade-btn">Upgrade</button>
+                    ${localStorage.getItem('isPremium') === 'true' ? '<span class="tag">Active</span>' : '<button class="upgrade-btn" onclick="window.location.href=\\\'checkout.html\\\'">Upgrade</button>'}
                 </div>
             </div>
         </section>
@@ -358,7 +364,7 @@ function injectVisionUI(container) {
             <div class="module-list" style="display: flex; gap: 15px;">
                 <div class="module-item inactive" style="flex: 1;">
                     <span>Telemetry & OEE</span>
-                    <button class="upgrade-btn">Upgrade</button>
+                    ${localStorage.getItem('isPremium') === 'true' ? '<span class="tag">Active</span>' : '<button class="upgrade-btn" onclick="window.location.href=\\\'checkout.html\\\'">Upgrade</button>'}
                 </div>
                 <div class="module-item active" style="flex: 1;">
                     <span>Vision Quality Control</span>
@@ -366,7 +372,7 @@ function injectVisionUI(container) {
                 </div>
                 <div class="module-item inactive" style="flex: 1;">
                     <span>Predictive Maintenance</span>
-                    <button class="upgrade-btn">Upgrade</button>
+                    ${localStorage.getItem('isPremium') === 'true' ? '<span class="tag">Active</span>' : '<button class="upgrade-btn" onclick="window.location.href=\\\'checkout.html\\\'">Upgrade</button>'}
                 </div>
             </div>
         </section>
@@ -420,11 +426,11 @@ function injectPredictiveUI(container) {
             <div class="module-list" style="display: flex; gap: 15px;">
                 <div class="module-item inactive" style="flex: 1;">
                     <span>Telemetry & OEE</span>
-                    <button class="upgrade-btn">Upgrade</button>
+                    ${localStorage.getItem('isPremium') === 'true' ? '<span class="tag">Active</span>' : '<button class="upgrade-btn" onclick="window.location.href=\\\'checkout.html\\\'">Upgrade</button>'}
                 </div>
                 <div class="module-item inactive" style="flex: 1;">
                     <span>Vision Quality Control</span>
-                    <button class="upgrade-btn">Upgrade</button>
+                    ${localStorage.getItem('isPremium') === 'true' ? '<span class="tag">Active</span>' : '<button class="upgrade-btn" onclick="window.location.href=\\\'checkout.html\\\'">Upgrade</button>'}
                 </div>
                 <div class="module-item active" style="flex: 1;">
                     <span>Predictive Maintenance</span>

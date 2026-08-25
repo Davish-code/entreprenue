@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncForge | Secure Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="checkout.css">
+</head>
+<body>
+    <div class="glow" style="top: -100px; left: -100px;"></div>
+    <div class="glow" style="bottom: -100px; right: -100px;"></div>
+
+    <div class="checkout-container">
+        <div id="checkout-content" class="checkout-content">
+            <h1 class="checkout-title">Complete Your Upgrade</h1>
+            <p class="checkout-subtitle">Scan the QR code to activate your Premium Subscription.</p>
+            
+            <div class="invoice-summary">
+                <div class="invoice-row">
+                    <span>Plan</span>
+                    <span class="highlight" id="plan-name">SyncForge Business Tier</span>
+                </div>
+                <div class="invoice-row">
+                    <span>Amount</span>
+                    <span class="highlight price">₹11,999/mo</span>
+                </div>
+            </div>
+
+            <div class="qr-container" id="qr-container">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=dummy@upi&pn=SyncForge&am=11999.00&cu=INR" alt="Payment QR Code" class="qr-code">
+            </div>
+
+            <button id="simulate-btn" class="simulate-btn">Simulate Payment</button>
+        </div>
+
+        <div id="success-content" class="success-content hidden">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+            <h2>Payment Successful!</h2>
+            <p>Your workspace is being upgraded...</p>
+        </div>
+    </div>
+
+    <script src="checkout.js"></script>
+</body>
+</html>
