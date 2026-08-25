@@ -1,20 +1,20 @@
 :root {
-    --bg-dark: #070b14;
-    --panel-dark: #111827;
+    --bg-dark: #0b0c10;
+    --panel-dark: #12141a;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
-    --accent-blue: #3b82f6;
-    --accent-blue-hover: #2563eb;
-    --accent-green: #10b981;
+    --accent-blue: #38bdf8;
+    --accent-blue-hover: #0284c7;
+    --accent-green: #34d399;
     --accent-green-hover: #059669;
-    --border-color: #1e293b;
+    --border-color: #1f2937;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 body {
@@ -26,10 +26,10 @@ body {
     
     /* Graphical Tech Grid Background */
     background-image: 
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(59, 130, 246, 0.2), transparent),
-        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 100% 100%, 40px 40px, 40px 40px;
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0, 229, 255, 0.05), transparent),
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 60px 60px, 60px 60px;
     background-position: center top, center center, center center;
     background-attachment: fixed;
 }
@@ -90,8 +90,12 @@ body::after {
 .nav-links a {
     color: var(--text-muted);
     text-decoration: none;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 13px;
     font-weight: 500;
     transition: 0.2s;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .nav-links a:hover {
@@ -103,21 +107,29 @@ body::after {
     color: var(--text-main);
     border: 1px solid var(--border-color);
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    font-weight: 600;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
 }
 
 .cta-btn {
     display: inline-block;
     text-decoration: none;
     background: var(--accent-blue);
-    color: white;
+    color: #000;
     border: none;
     padding: 8px 20px;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
+    font-family: 'Roboto Mono', monospace;
     font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
     transition: 0.2s;
 }
 
@@ -146,28 +158,41 @@ body::after {
     text-align: center;
     padding: 120px 5% 80px;
     min-height: 80vh;
-    background: radial-gradient(circle at 50% 0%, #1e293b 0%, #070b14 70%);
+    background: transparent;
 }
 
 .badge {
-    background: rgba(59, 130, 246, 0.1);
+    background: transparent;
     color: var(--accent-blue);
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    border: 1px solid var(--accent-blue);
     padding: 6px 16px;
     border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Roboto Mono', monospace;
     margin-bottom: 24px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     animation: fadeInUp 0.8s ease backwards;
     animation-delay: 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.badge::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-blue);
 }
 
 .hero h1 {
     font-size: 56px;
-    font-weight: 800;
-    line-height: 1.1;
+    font-weight: 600;
+    line-height: 1.2;
     margin-bottom: 24px;
     letter-spacing: -1px;
     animation: fadeInUp 0.8s ease backwards;
@@ -182,7 +207,8 @@ body::after {
     font-size: 18px;
     color: var(--text-muted);
     max-width: 600px;
-    margin-bottom: 40px;
+    margin: 0 auto 40px;
+    text-align: center;
     animation: fadeInUp 0.8s ease backwards;
     animation-delay: 0.5s;
 }
@@ -197,7 +223,7 @@ body::after {
 
 .cta-btn.large {
     padding: 14px 32px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .secondary-btn {
@@ -458,7 +484,8 @@ body::after {
 .sub-heading {
     color: var(--accent-blue);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 500;
+    font-family: 'Roboto Mono', monospace;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     display: block;
@@ -488,11 +515,11 @@ body::after {
 }
 
 .solution-card {
-    background: rgba(17, 24, 39, 0.6);
+    background: rgba(17, 24, 39, 0.4);
     backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 40px 30px;
+    border-radius: 8px;
+    padding: 32px 24px;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -548,8 +575,12 @@ body::after {
     color: var(--accent-blue);
     border: 1px solid var(--accent-blue);
     padding: 12px;
-    border-radius: 6px;
+    border-radius: 4px;
+    font-family: 'Roboto Mono', monospace;
     font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
     cursor: pointer;
     transition: 0.2s;
     width: 100%;
@@ -633,10 +664,16 @@ body::after {
     transform: translateX(-50%);
 }
 
+/* Pricing Section */
+.pricing-section {
+    padding: 100px 5%;
+    background: transparent;
+}
+
 /* ROI Section */
 .roi-section {
     padding: 100px 5%;
-    background: rgba(15, 23, 42, 0.4);
+    background: transparent;
     backdrop-filter: blur(12px);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     text-align: center;
@@ -798,7 +835,7 @@ body::after {
 /* R&D Credibility Section */
 .rnd-section {
     padding: 80px 5%;
-    background: rgba(15, 23, 42, 0.4);
+    background: transparent;
     backdrop-filter: blur(12px);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
