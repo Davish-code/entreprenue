@@ -105,8 +105,8 @@ window.handleAuth = async function(event) {
             });
             
             console.log("Pilot requested for UID: ", user.uid);
-            alert("Success! Your pilot environment is being provisioned.");
-            window.location.href = "dashboard.html"; 
+            alert("Success! Redirecting to checkout...");
+            window.location.href = "checkout.html"; 
         } catch (error) {
             console.error("Error signing up: ", error);
             alert("Error: " + error.message);
@@ -282,7 +282,7 @@ if (googleSsoBtn) {
             });
 
             alert(`Authenticated successfully as ${user.email}`);
-            window.location.href = "dashboard.html";
+            window.location.href = "checkout.html";
             
         } catch (error) {
             console.error("SSO Failed: ", error.message);
