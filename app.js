@@ -724,6 +724,11 @@ window.showStudentDetail = async function(docId) {
                                 </summary>
                                 <div style="padding: 0 16px 16px 16px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:16px; margin-top:4px; color:#cbd5e1; font-size:14px; line-height:1.6; overflow-x: auto;">
                                     ${parseMarkdown(d.analysis_report)}
+                                    <div style="margin-top: 16px;">
+                                        <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="alert('Starting Virtual Interview...')">
+                                            Start Virtual Interview
+                                        </button>
+                                    </div>
                                 </div>
                             </details>
                         `;
@@ -1049,7 +1054,13 @@ window.runSubjectAnalysis = async function() {
             });
 
             // Display results in Modal
-            results.innerHTML = parseMarkdown(data.analysis);
+            results.innerHTML = parseMarkdown(data.analysis) + `
+                <div style="margin-top: 20px; text-align: center;">
+                    <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="alert('Starting Virtual Interview...')">
+                        Start Virtual Interview
+                    </button>
+                </div>
+            `;
             loading.style.display = 'none';
             results.style.display = 'block';
         }
