@@ -725,7 +725,7 @@ window.showStudentDetail = async function(docId) {
                                 <div style="padding: 0 16px 16px 16px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:16px; margin-top:4px; color:#cbd5e1; font-size:14px; line-height:1.6; overflow-x: auto;">
                                     ${parseMarkdown(d.analysis_report)}
                                     <div style="margin-top: 16px;">
-                                        <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="alert('Starting Virtual Interview...')">
+                                        <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="startVirtualInterview(this)" data-subject="${d.subject}" data-report="${btoa(unescape(encodeURIComponent(d.analysis_report || '')))}">
                                             Start Virtual Interview
                                         </button>
                                     </div>
@@ -1056,7 +1056,7 @@ window.runSubjectAnalysis = async function() {
             // Display results in Modal
             results.innerHTML = parseMarkdown(data.analysis) + `
                 <div style="margin-top: 20px; text-align: center;">
-                    <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="alert('Starting Virtual Interview...')">
+                    <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="startVirtualInterview(this)" data-subject="${modal.dataset.subject}" data-report="${btoa(unescape(encodeURIComponent(data.analysis || '')))}">
                         Start Virtual Interview
                     </button>
                 </div>
@@ -1325,3 +1325,198 @@ window.loadAnalyticsData = async function(container) {
         });
     }
 };
+
+// ==========================================
+// VIRTUAL INTERVIEW LOGIC
+// ==========================================
+window.startVirtualInterview = async function(button) {
+    const subject = button.getAttribute('data-subject');
+    const reportBase64 = button.getAttribute('data-report');
+    const report = decodeURIComponent(escape(atob(reportBase64)));
+    
+    // Create Modal UI if it doesn't exist
+    let modal = document.getElementById('interview-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'interview-modal';
+        modal.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column;">
+                <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 30px; width: 90%; max-width: 600px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+                    <h2 style="color: #f8fafc; font-size: 24px; margin-bottom: 20px;">Virtual Interview: <span style="color:#60a5fa">${subject}</span></h2>
+                    
+                    <div id="interview-status" style="color: #94a3b8; margin-bottom: 20px; font-size: 14px;">Connecting to AI Interviewer...</div>
+                    <div id="interview-prompt" style="color: #cbd5e1; font-size: 16px; line-height: 1.6; margin-bottom: 30px; font-style: italic; min-height: 80px;"></div>
+                    
+                    <div id="record-controls" style="display: none;">
+                        <button id="btn-record" style="background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; gap: 8px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: white; border-radius: 50%; animation: pulse 1.5s infinite;"></span>
+                            Start Recording
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <button onclick="document.getElementById('interview-modal').style.display='none'" style="background: transparent; border: none; color: #64748b; cursor: pointer; text-decoration: underline;">Cancel Interview</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    modal.style.display = 'flex';
+    const statusEl = document.getElementById('interview-status');
+    const promptEl = document.getElementById('interview-prompt');
+    const controls = document.getElementById('record-controls');
+    const btnRecord = document.getElementById('btn-record');
+    
+    statusEl.innerText = "Analyzing CAT report & generating prompt...";
+    promptEl.innerText = "";
+    controls.style.display = 'none';
+    
+    let originalPromptText = "";
+    
+    try {
+        // 1. Generate Interview Prompt
+        const response = await fetch('http://localhost:8000/api/generate-interview', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ analysis_report: report, subject: subject })
+        });
+        
+        if (!response.ok) throw new Error("Failed to generate prompt. Ensure backend is running at http://localhost:8000");
+        
+        const data = await response.json();
+        originalPromptText = data.prompt_text;
+        
+        statusEl.innerText = "AI is speaking...";
+        promptEl.innerText = `"${originalPromptText}"`;
+        
+        // Play AI Voice
+        if (data.audio_base64) {
+            const audio = new Audio(data.audio_base64);
+            audio.play();
+            audio.onended = () => {
+                statusEl.innerText = "Your turn. Click below to start answering.";
+                controls.style.display = 'block';
+            };
+        } else {
+            statusEl.innerText = "Your turn. Click below to start answering.";
+            controls.style.display = 'block';
+        }
+        
+    } catch (e) {
+        statusEl.innerText = "Error: " + e.message;
+        return;
+    }
+    
+    // 2. Recording Logic
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+    
+    btnRecord.onclick = async () => {
+        if (!isRecording) {
+            // Start Recording
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    await submitInterviewAudio(audioBlob, subject, originalPromptText, statusEl, promptEl, controls);
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                btnRecord.innerHTML = "Stop Recording";
+                btnRecord.style.background = "#3b82f6"; // blue
+                statusEl.innerText = "Recording... Speak clearly.";
+                
+            } catch (err) {
+                alert("Microphone access denied or unavailable.");
+            }
+        } else {
+            // Stop Recording
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(t => t.stop());
+            isRecording = false;
+            btnRecord.innerHTML = "Start Recording";
+            btnRecord.style.background = "#ef4444";
+            controls.style.display = 'none';
+        }
+    };
+};
+
+async function submitInterviewAudio(audioBlob, subject, originalPrompt, statusEl, promptEl, controls) {
+    statusEl.innerText = "Transcribing and evaluating your response via Whisper & LLM...";
+    promptEl.innerText = "";
+    
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'response.webm');
+    formData.append('subject', subject);
+    formData.append('original_prompt', originalPrompt);
+    
+    try {
+        const response = await fetch('http://localhost:8000/api/evaluate-interview', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) throw new Error("Evaluation failed.");
+        const result = await response.json();
+        
+        promptEl.innerHTML = `
+            <div style="font-size: 14px; color: #94a3b8; margin-bottom: 15px;">Your Transcript: "${result.transcription}"</div>
+            <div style="color: ${result.score >= 70 ? '#10b981' : '#ef4444'}; font-weight: bold; margin-bottom: 10px;">Score: ${result.score}/100</div>
+            <div style="font-style: italic; color: #f8fafc;">"${result.ai_voice_response}"</div>
+        `;
+        
+        statusEl.innerText = result.deploy_sandbox ? "Action Required!" : "Interview Passed.";
+        
+        if (result.audio_base64) {
+            const audio = new Audio(result.audio_base64);
+            audio.play();
+        }
+        
+        if (result.deploy_sandbox) {
+            setTimeout(() => {
+                document.getElementById('interview-modal').style.display = 'none';
+                deploySandboxDrop(subject);
+            }, 6000); // give them 6 seconds to hear the AI drop the sandbox
+        }
+        
+    } catch (e) {
+        statusEl.innerText = "Error: " + e.message;
+    }
+}
+
+function deploySandboxDrop(subject) {
+    const container = document.getElementById('dashboard-content');
+    if (!container) return;
+    
+    const sandboxHTML = `
+        <section class="card" style="grid-column: span 2; border: 2px solid #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); animation: slideDown 0.5s ease-out;">
+            <h3 style="color: #ef4444; display: flex; align-items: center; gap: 10px;">
+                ⚠️ Sandbox Deployed: Immediate Action Required
+            </h3>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">Your interview response failed to demonstrate practical application. You have been assigned a mandatory micro-project.</p>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 15px;">
+                <h4 style="color: #60a5fa; margin-bottom: 10px; font-family: 'Roboto Mono', monospace;">Task: Secure DB Fetch in Python</h4>
+                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">Write a Python script that connects to a MySQL database using a connection string, executes a cursor query securely (preventing SQL injection), and prints the user records.</p>
+                <textarea style="width: 100%; height: 150px; background: #0f172a; color: #10b981; font-family: 'Roboto Mono', monospace; border: 1px solid #334155; border-radius: 4px; padding: 10px; resize: vertical;" placeholder="# Write your Python code here..."></textarea>
+                <div style="text-align: right; margin-top: 10px;">
+                    <button class="upgrade-btn" style="background: #ef4444; color: white; border: none; padding: 8px 20px;" onclick="alert('Evaluating code...')">Run Code</button>
+                </div>
+            </div>
+        </section>
+    `;
+    
+    // Inject at the top
+    container.insertAdjacentHTML('afterbegin', sandboxHTML);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
