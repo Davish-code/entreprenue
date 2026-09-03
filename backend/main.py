@@ -19,8 +19,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Optional: Ensure you have OPENAI_API_KEY set in your environment
-openai.api_key = os.getenv("OPENAI_API_KEY", "")
+api_key = os.getenv("OPENAI_API_KEY", "")
+client = openai.OpenAI(api_key=api_key)
 
 class PromptRequest(BaseModel):
     analysis_report: str
@@ -31,7 +31,7 @@ async def generate_interview(request: PromptRequest):
     """
     Generates the dynamic targeted interrogation prompt based on the CAT report.
     """
-    if not openai.api_key:
+    if not api_key:
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
         
     system_prompt = (
@@ -43,7 +43,7 @@ async def generate_interview(request: PromptRequest):
     )
     
     try:
-        response = openai.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -53,7 +53,7 @@ async def generate_interview(request: PromptRequest):
         ai_text = response.choices[0].message.content
         
         # Generate TTS audio for the prompt
-        audio_response = openai.audio.speech.create(
+        audio_response = client.audio.speech.create(
             model="tts-1",
             voice="alloy",
             input=ai_text,
@@ -83,7 +83,7 @@ async def evaluate_interview(
     """
     Accepts the audio blob, transcribes it via Whisper, evaluates it, and decides whether to drop a sandbox.
     """
-    if not openai.api_key:
+    if not api_key:
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
         
     # Transcribe Audio
@@ -94,7 +94,7 @@ async def evaluate_interview(
             buffer.write(await audio.read())
             
         with open(temp_file_path, "rb") as f:
-            transcript = openai.audio.transcriptions.create(
+            transcript = client.audio.transcriptions.create(
                 model="whisper-1", 
                 file=f
             )
@@ -119,7 +119,7 @@ async def evaluate_interview(
     )
     
     try:
-        response = openai.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             response_format={ "type": "json_object" },
             messages=[
@@ -132,7 +132,7 @@ async def evaluate_interview(
         result_json["transcription"] = transcribed_text
         
         # Generate TTS for the AI feedback
-        audio_feedback = openai.audio.speech.create(
+        audio_feedback = client.audio.speech.create(
             model="tts-1",
             voice="alloy",
             input=result_json["ai_voice_response"],
@@ -147,3 +147,7 @@ async def evaluate_interview(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Evaluation failed: {str(e)}")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
