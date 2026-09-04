@@ -1,9 +1,12 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import openai
+from openai import OpenAI
 import os
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="Virtual Interview API")
 
@@ -15,12 +18,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-api_key = os.getenv("OPENAI_API_KEY", "")
-client = openai.OpenAI(api_key=api_key)
+api_key = os.getenv("GROQ_API_KEY", "")
+client = OpenAI(
+    api_key=api_key,
+    base_url="https://api.groq.com/openai/v1",
+)
 
 class PromptRequest(BaseModel):
     analysis_report: str
@@ -29,10 +31,10 @@ class PromptRequest(BaseModel):
 @app.post("/api/generate-interview")
 async def generate_interview(request: PromptRequest):
     """
-    Generates the dynamic targeted interrogation prompt based on the CAT report.
+    Generates the dynamic targeted interrogation prompt based on the CAT report using Groq.
     """
     if not api_key:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY not configured")
         
     system_prompt = (
         "You are a strict, highly technical interviewer. The user has failed a section of an exam. "
@@ -44,7 +46,7 @@ async def generate_interview(request: PromptRequest):
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Subject: {request.subject}\nReport:\n{request.analysis_report}"}
@@ -52,23 +54,10 @@ async def generate_interview(request: PromptRequest):
         )
         ai_text = response.choices[0].message.content
         
-        # Generate TTS audio for the prompt
-        audio_response = client.audio.speech.create(
-            model="tts-1",
-            voice="alloy",
-            input=ai_text,
-            response_format="mp3"
-        )
-        
-        # In a real app, you might save this to S3/Cloud storage and return a URL.
-        # For simplicity, we can just return the text and let the frontend use native TTS,
-        # or return a base64 encoded string of the audio.
-        import base64
-        audio_base64 = base64.b64encode(audio_response.content).decode("utf-8")
-        
+        # Groq does not have a native TTS API yet, so we return the text and let the frontend use native browser TTS.
         return {
             "prompt_text": ai_text,
-            "audio_base64": f"data:audio/mp3;base64,{audio_base64}"
+            "audio_base64": None
         }
         
     except Exception as e:
@@ -81,28 +70,31 @@ async def evaluate_interview(
     original_prompt: str = Form(...)
 ):
     """
-    Accepts the audio blob, transcribes it via Whisper, evaluates it, and decides whether to drop a sandbox.
+    Accepts the audio blob, transcribes it via Whisper on Groq, evaluates it, and decides whether to drop a sandbox.
     """
     if not api_key:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY not configured")
         
     # Transcribe Audio
     try:
-        # Save temporary file since Whisper API needs a file with extension
+        # Save temporary file since Groq Whisper API needs a file with extension
+        # Using .webm because frontend sends webm
         temp_file_path = f"temp_{audio.filename}"
         with open(temp_file_path, "wb") as buffer:
             buffer.write(await audio.read())
             
         with open(temp_file_path, "rb") as f:
             transcript = client.audio.transcriptions.create(
-                model="whisper-1", 
-                file=f
+                model="whisper-large-v3", 
+                file=(temp_file_path, f.read())
             )
             
         os.remove(temp_file_path)
         transcribed_text = transcript.text
         
     except Exception as e:
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
 
     # Evaluate Transcription
@@ -112,15 +104,14 @@ async def evaluate_interview(
         "1. Did they outline concrete, correct technical steps? "
         "2. Did they sound hesitant or use excessive filler words (um, uh, like)? "
         "Output ONLY a valid JSON object with these exact keys: "
-        "'score' (integer 0-100), "
-        "'deploy_sandbox' (boolean, true if score < 70), "
-        "'ai_voice_response' (string, strict feedback to the user), "
-        "'transcription' (string, the original transcript)"
+        "\"score\" (integer 0-100), "
+        "\"deploy_sandbox\" (boolean, true if score < 70), "
+        "\"ai_voice_response\" (string, strict feedback to the user)."
     )
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="llama-3.1-8b-instant",
             response_format={ "type": "json_object" },
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -130,18 +121,7 @@ async def evaluate_interview(
         
         result_json = json.loads(response.choices[0].message.content)
         result_json["transcription"] = transcribed_text
-        
-        # Generate TTS for the AI feedback
-        audio_feedback = client.audio.speech.create(
-            model="tts-1",
-            voice="alloy",
-            input=result_json["ai_voice_response"],
-            response_format="mp3"
-        )
-        
-        import base64
-        audio_base64 = base64.b64encode(audio_feedback.content).decode("utf-8")
-        result_json["audio_base64"] = f"data:audio/mp3;base64,{audio_base64}"
+        result_json["audio_base64"] = None
         
         return result_json
         

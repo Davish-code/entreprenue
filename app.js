@@ -1329,6 +1329,8 @@ window.loadAnalyticsData = async function(container) {
 // ==========================================
 // VIRTUAL INTERVIEW LOGIC
 // ==========================================
+const INTERVIEW_API_BASE_URL = "http://localhost:8000"; // Update with your tunnel URL if testing live
+
 window.startVirtualInterview = async function(button) {
     const subject = button.getAttribute('data-subject');
     const reportBase64 = button.getAttribute('data-report');
@@ -1377,13 +1379,13 @@ window.startVirtualInterview = async function(button) {
     
     try {
         // 1. Generate Interview Prompt
-        const response = await fetch('http://localhost:8000/api/generate-interview', {
+        const response = await fetch(`${INTERVIEW_API_BASE_URL}/api/generate-interview`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ analysis_report: report, subject: subject })
         });
         
-        if (!response.ok) throw new Error("Failed to generate prompt. Ensure backend is running at http://localhost:8000");
+        if (!response.ok) throw new Error("Failed to generate prompt. Ensure backend is running.");
         
         const data = await response.json();
         originalPromptText = data.prompt_text;
@@ -1399,6 +1401,13 @@ window.startVirtualInterview = async function(button) {
                 statusEl.innerText = "Your turn. Click below to start answering.";
                 controls.style.display = 'block';
             };
+        } else if ('speechSynthesis' in window) {
+            const msg = new SpeechSynthesisUtterance(originalPromptText);
+            msg.onend = () => {
+                statusEl.innerText = "Your turn. Click below to start answering.";
+                controls.style.display = 'block';
+            };
+            window.speechSynthesis.speak(msg);
         } else {
             statusEl.innerText = "Your turn. Click below to start answering.";
             controls.style.display = 'block';
@@ -1462,7 +1471,7 @@ async function submitInterviewAudio(audioBlob, subject, originalPrompt, statusEl
     formData.append('original_prompt', originalPrompt);
     
     try {
-        const response = await fetch('http://localhost:8000/api/evaluate-interview', {
+        const response = await fetch(`${INTERVIEW_API_BASE_URL}/api/evaluate-interview`, {
             method: 'POST',
             body: formData
         });
@@ -1481,6 +1490,9 @@ async function submitInterviewAudio(audioBlob, subject, originalPrompt, statusEl
         if (result.audio_base64) {
             const audio = new Audio(result.audio_base64);
             audio.play();
+        } else if ('speechSynthesis' in window) {
+            const msg = new SpeechSynthesisUtterance(result.ai_voice_response);
+            window.speechSynthesis.speak(msg);
         }
         
         if (result.deploy_sandbox) {
