@@ -729,7 +729,7 @@ window.showStudentDetail = async function(docId) {
                                             Start Virtual Interview
                                         </button>
                                     </div>
-                                    ${d.interview ? `
+                                    ${(console.log('Rendering test:', d.subject, 'Has interview:', !!d.interview), d.interview) ? `
                                     <div style="margin-top: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.2);">
                                         <h4 style="color: #60a5fa; margin-top: 0; margin-bottom: 8px; font-size: 14px;">Virtual Interview Response</h4>
                                         <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;"><b>Prompt:</b> ${d.interview.prompt}</div>
@@ -1499,6 +1499,7 @@ async function submitInterviewAudio(audioBlob, subject, originalPrompt, statusEl
         statusEl.innerText = result.deploy_sandbox ? "Action Required!" : "Interview Passed.";
 
         // Save interview results to Firestore
+        console.log("Attempting to save interview...", { docId, studentId, result });
         if (docId && studentId) {
             try {
                 await updateDoc(doc(db, "students", studentId, "diagnostics", docId), {
