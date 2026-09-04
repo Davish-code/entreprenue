@@ -698,7 +698,7 @@ window.showStudentDetail = async function(docId) {
                 
                 if (!diagSnap.empty) {
                     const docs = [];
-                    diagSnap.forEach(d => docs.push(d.data()));
+                    diagSnap.forEach(d => docs.push({ id: d.id, ...d.data() }));
                     // Sort descending by date
                     docs.sort((a, b) => {
                         const getMs = (t) => t ? (typeof t.toMillis === 'function' ? t.toMillis() : new Date(t).getTime()) : 0;
@@ -725,10 +725,19 @@ window.showStudentDetail = async function(docId) {
                                 <div style="padding: 0 16px 16px 16px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:16px; margin-top:4px; color:#cbd5e1; font-size:14px; line-height:1.6; overflow-x: auto;">
                                     ${parseMarkdown(d.analysis_report)}
                                     <div style="margin-top: 16px;">
-                                        <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="startVirtualInterview(this)" data-subject="${d.subject}" data-report="${btoa(unescape(encodeURIComponent(d.analysis_report || '')))}">
+                                        <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="startVirtualInterview(this)" data-subject="${d.subject}" data-report="${btoa(unescape(encodeURIComponent(d.analysis_report || '')))}" data-docid="${d.id}" data-studentid="${currentStudentId}">
                                             Start Virtual Interview
                                         </button>
                                     </div>
+                                    ${d.interview ? `
+                                    <div style="margin-top: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.2);">
+                                        <h4 style="color: #60a5fa; margin-top: 0; margin-bottom: 8px; font-size: 14px;">Virtual Interview Response</h4>
+                                        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;"><b>Prompt:</b> ${d.interview.prompt}</div>
+                                        <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 8px;"><b>Student:</b> "${d.interview.transcription}"</div>
+                                        <div style="font-size: 13px; color: ${d.interview.score >= 70 ? '#10b981' : '#ef4444'}; font-weight: bold; margin-bottom: 4px;">Score: ${d.interview.score}/100</div>
+                                        <div style="font-size: 13px; font-style: italic; color: #f8fafc;"><b>AI Feedback:</b> "${d.interview.feedback}"</div>
+                                    </div>
+                                    ` : ''}
                                 </div>
                             </details>
                         `;
@@ -1044,7 +1053,7 @@ window.runSubjectAnalysis = async function() {
         
         if (data.analysis) {
             // Save AI text to Firestore
-            await addDoc(collection(db, "students", modal.dataset.studentDocId, "diagnostics"), {
+            const docRef = await addDoc(collection(db, "students", modal.dataset.studentDocId, "diagnostics"), {
                 subject: modal.dataset.subject,
                 marks: modal.dataset.marks,
                 attendance: modal.dataset.attendance,
@@ -1056,7 +1065,7 @@ window.runSubjectAnalysis = async function() {
             // Display results in Modal
             results.innerHTML = parseMarkdown(data.analysis) + `
                 <div style="margin-top: 20px; text-align: center;">
-                    <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="startVirtualInterview(this)" data-subject="${modal.dataset.subject}" data-report="${btoa(unescape(encodeURIComponent(data.analysis || '')))}">
+                    <button style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 13px;" onmouseover="this.style.background='#3b82f6'; this.style.color='#fff';" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'; this.style.color='#60a5fa';" onclick="startVirtualInterview(this)" data-subject="${modal.dataset.subject}" data-report="${btoa(unescape(encodeURIComponent(data.analysis || '')))}" data-docid="${docRef.id}" data-studentid="${modal.dataset.studentDocId}">
                         Start Virtual Interview
                     </button>
                 </div>
@@ -1334,6 +1343,8 @@ const INTERVIEW_API_BASE_URL = "https://streams-lights-genetics-spies.trycloudfl
 window.startVirtualInterview = async function(button) {
     const subject = button.getAttribute('data-subject');
     const reportBase64 = button.getAttribute('data-report');
+    const docId = button.getAttribute('data-docid');
+    const studentId = button.getAttribute('data-studentid');
     const report = decodeURIComponent(escape(atob(reportBase64)));
     
     // Create Modal UI if it doesn't exist
@@ -1437,8 +1448,8 @@ window.startVirtualInterview = async function(button) {
                 
                 mediaRecorder.onstop = async () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    await submitInterviewAudio(audioBlob, subject, originalPromptText, statusEl, promptEl, controls);
-                };
+                     submitInterviewAudio(audioBlob, subject, originalPromptText, statusEl, promptEl, controls, docId, studentId);
+        };
                 
                 mediaRecorder.start();
                 isRecording = true;
@@ -1461,7 +1472,7 @@ window.startVirtualInterview = async function(button) {
     };
 };
 
-async function submitInterviewAudio(audioBlob, subject, originalPrompt, statusEl, promptEl, controls) {
+async function submitInterviewAudio(audioBlob, subject, originalPrompt, statusEl, promptEl, controls, docId, studentId) {
     statusEl.innerText = "Transcribing and evaluating your response via Whisper & LLM...";
     promptEl.innerText = "";
     
@@ -1486,6 +1497,24 @@ async function submitInterviewAudio(audioBlob, subject, originalPrompt, statusEl
         `;
         
         statusEl.innerText = result.deploy_sandbox ? "Action Required!" : "Interview Passed.";
+
+        // Save interview results to Firestore
+        if (docId && studentId) {
+            try {
+                await updateDoc(doc(db, "students", studentId, "diagnostics", docId), {
+                    interview: {
+                        prompt: originalPrompt,
+                        transcription: result.transcription,
+                        score: result.score,
+                        feedback: result.ai_voice_response,
+                        passed: !result.deploy_sandbox,
+                        timestamp: new Date().toISOString()
+                    }
+                });
+            } catch (err) {
+                console.error("Error saving interview results:", err);
+            }
+        }
         
         if (result.audio_base64) {
             const audio = new Audio(result.audio_base64);
