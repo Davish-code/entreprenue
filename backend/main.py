@@ -46,7 +46,7 @@ async def generate_interview(request: PromptRequest):
     
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="groq/compound-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Subject: {request.subject}\nReport:\n{request.analysis_report}"}
@@ -111,7 +111,7 @@ async def evaluate_interview(
     
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="groq/compound-mini",
             response_format={ "type": "json_object" },
             messages=[
                 {"role": "system", "content": system_prompt},
